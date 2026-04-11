@@ -1,24 +1,18 @@
 import { redirect } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
 import {
-  BarChart3,
-  Clock,
-  ShieldCheck,
-  Sparkles,
-  Target,
-  Workflow,
+  Trash2,
+  EyeOff,
+  Wrench,
+  Brain,
+  CloudCog,
+  TrendingDown,
+  Check,
 } from "lucide-react";
 
 export default async function LandingPage() {
@@ -26,183 +20,264 @@ export default async function LandingPage() {
   if (session?.user?.email) redirect("/app");
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-white">
       <SiteHeader />
       <main className="flex-1">
         {/* Hero */}
-        <section className="relative overflow-hidden bg-[#1E3A8A] text-white">
-          <div className="absolute inset-0 opacity-20 [background:radial-gradient(ellipse_at_top,#5FA8FF,transparent_60%)]" />
-          <div className="relative mx-auto max-w-6xl px-6 py-24 md:py-32">
-            <Badge variant="secondary" className="mb-6 bg-accent text-accent-foreground">
-              FinOps SaaS multi-tenant para AWS
-            </Badge>
-            <h1 className="max-w-3xl text-4xl font-bold tracking-tight md:text-6xl">
-              Controle de custos em nuvem, inteligência para economizar
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg text-white/80 md:text-xl">
-              Plataforma FinOps SaaS multi-tenant para AWS com atualização diária
-              e foco em visibilidade, priorização e governança operacional.
-            </p>
-            <div className="mt-10 flex flex-wrap gap-4">
-              <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
-                <Link href="/signup">Começar trial de 90 dias</Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="border-white/30 bg-transparent text-white hover:bg-white/10"
-              >
-                <Link href="/pricing">Ver pricing</Link>
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        {/* Problem */}
-        <section className="mx-auto max-w-6xl px-6 py-20">
-          <div className="grid gap-10 md:grid-cols-2 md:items-center">
+        <section className="relative overflow-hidden bg-gradient-to-br from-[#1E3A8A] via-[#2563EB] to-[#38BDF8] text-white">
+          <div className="absolute inset-0 opacity-30 [background:radial-gradient(ellipse_at_bottom_right,#5EEAD4,transparent_60%)]" />
+          <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-6 py-20 md:grid-cols-2 md:py-28">
             <div>
-              <h2 className="text-3xl font-bold tracking-tight text-foreground">
-                Gasto AWS sem governança vira dívida silenciosa
-              </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Times FinOps lutam contra dados dispersos em Cost Explorer, CUR,
-                Compute Optimizer, Trusted Advisor e dezenas de contas. Sem
-                consolidação, as recomendações viram backlog esquecido e a conta
-                mensal sobe sem dono.
+              <h1 className="text-4xl font-bold leading-tight tracking-tight md:text-5xl">
+                Controle de custos em nuvem, inteligencia para economizar
+              </h1>
+              <p className="mt-6 max-w-lg text-lg text-white/80">
+                Otimizamos seus custos com a AWS atraves de IA avancada,
+                visibilidade completa e priorizacao de economia.
               </p>
+              <div className="mt-8">
+                <Button
+                  asChild
+                  size="lg"
+                  className="bg-[#34D399] text-white hover:bg-[#2CC085] shadow-lg"
+                >
+                  <Link href="/signup">Comece gratis</Link>
+                </Button>
+              </div>
             </div>
-            <Card className="border-border">
-              <CardContent className="space-y-4 p-6">
-                <div className="flex items-start gap-3">
-                  <div className="h-2 w-2 mt-2 rounded-full bg-negative" />
-                  <p className="text-sm">
-                    Recomendações do Cost Optimization Hub ignoradas por falta de owner
+
+            {/* Dashboard mockup */}
+            <div className="relative hidden md:block">
+              <div className="rounded-2xl border border-white/20 bg-white/10 p-6 shadow-2xl backdrop-blur-sm">
+                <div className="mb-4 flex items-center justify-between">
+                  <p className="text-xs font-medium text-white/60">
+                    Gasto mensal consolidado
                   </p>
+                  <p className="text-2xl font-bold">R$ 225.115</p>
                 </div>
-                <div className="flex items-start gap-3">
-                  <div className="h-2 w-2 mt-2 rounded-full bg-negative" />
-                  <p className="text-sm">
-                    Tags inconsistentes impedem allocation e chargeback confiáveis
-                  </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="rounded-xl bg-white/10 p-4">
+                    <p className="text-[10px] uppercase text-white/50">
+                      Economias
+                    </p>
+                    <p className="mt-1 text-xl font-bold text-[#34D399]">
+                      R$ 3.755
+                    </p>
+                    <p className="mt-1 text-xs text-[#34D399]">+18,4%</p>
+                  </div>
+                  <div className="rounded-xl bg-white/10 p-4">
+                    <p className="text-[10px] uppercase text-white/50">
+                      Desperdicio
+                    </p>
+                    <p className="mt-1 text-xl font-bold text-[#FB923C]">
+                      R$ 1.972
+                    </p>
+                    <p className="mt-1 text-xs text-[#FB923C]">-7,2%</p>
+                  </div>
                 </div>
-                <div className="flex items-start gap-3">
-                  <div className="h-2 w-2 mt-2 rounded-full bg-negative" />
-                  <p className="text-sm">
-                    Sem trilha de auditoria para exceções e aprovações
-                  </p>
+                <div className="mt-4 flex items-end gap-1">
+                  {[40, 55, 45, 65, 50, 70, 60, 80, 72, 85, 78, 90].map(
+                    (h, i) => (
+                      <div
+                        key={i}
+                        className="flex-1 rounded-sm bg-gradient-to-t from-[#34D399] to-[#5EEAD4]"
+                        style={{ height: `${h}px` }}
+                      />
+                    ),
+                  )}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
+          </div>
+
+          {/* Wave divider */}
+          <div className="absolute bottom-0 left-0 right-0">
+            <svg
+              viewBox="0 0 1440 80"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-full"
+            >
+              <path
+                d="M0 40C240 80 480 0 720 40C960 80 1200 0 1440 40V80H0V40Z"
+                fill="white"
+              />
+            </svg>
           </div>
         </section>
 
-        {/* Features */}
-        <section className="bg-card border-y border-border">
+        {/* O Problema */}
+        <section className="mx-auto max-w-6xl px-6 py-20">
+          <h2 className="text-center text-3xl font-bold tracking-tight text-[#1E3A8A]">
+            O Problema
+          </h2>
+          <div className="mt-12 grid gap-8 md:grid-cols-3">
+            <ProblemCard
+              icon={<Trash2 className="h-8 w-8 text-[#38BDF8]" />}
+              title="Desperdicio"
+              description="Recursos nao utilizados geram custos desnecessarios. Instancias ociosas, volumes orfaos e reservas expiradas consomem orcamento silenciosamente."
+            />
+            <ProblemCard
+              icon={<EyeOff className="h-8 w-8 text-[#38BDF8]" />}
+              title="Sem Visibilidade"
+              description="Dificil identificar onde estao os maiores gastos na sua nuvem. Dados dispersos entre Cost Explorer, CUR e dezenas de contas AWS."
+            />
+            <ProblemCard
+              icon={<Wrench className="h-8 w-8 text-[#38BDF8]" />}
+              title="Trabalho Manual"
+              description="Leva tempo demais para analisar e otimizar manualmente cada conta e servico. Recomendacoes viram backlog esquecido."
+            />
+          </div>
+        </section>
+
+        {/* A Solucao */}
+        <section className="bg-gradient-to-b from-[#F0F9FF] to-white">
           <div className="mx-auto max-w-6xl px-6 py-20">
-            <div className="mx-auto max-w-2xl text-center">
-              <Badge variant="secondary">Plataforma</Badge>
-              <h2 className="mt-4 text-3xl font-bold tracking-tight">
-                Consolidação diária, ações priorizadas, trilha auditável
-              </h2>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Nimbus Frugal conecta a conta management da sua AWS Organization,
-                descobre OUs e contas, coleta custo e recomendações, e entrega
-                ações priorizadas com owner e justificativa.
-              </p>
-            </div>
-            <div className="mt-14 grid gap-6 md:grid-cols-3">
-              <Feature
-                icon={<BarChart3 className="h-5 w-5" />}
-                title="Dashboard consolidado"
-                description="Custo por organização, OU, conta, região e serviço, atualizado em batch a cada 24h."
-              />
-              <Feature
-                icon={<Sparkles className="h-5 w-5" />}
-                title="Recomendações unificadas"
-                description="Ingestão de Cost Optimization Hub, Compute Optimizer e Trusted Advisor em uma única fila priorizada."
-              />
-              <Feature
-                icon={<Target className="h-5 w-5" />}
-                title="Ações com owner"
-                description="Cada oportunidade vira action candidate com responsável, prioridade e status."
-              />
-              <Feature
-                icon={<Workflow className="h-5 w-5" />}
-                title="Onboarding AWS Org"
-                description="CloudFormation com External ID e trust policy para a conta AWS da Nimbus — sem credenciais armazenadas."
-              />
-              <Feature
-                icon={<ShieldCheck className="h-5 w-5" />}
-                title="Governança auditável"
-                description="Exceções com justificativa, aprovação e expiração. Tudo registrado em audit log."
-              />
-              <Feature
-                icon={<Clock className="h-5 w-5" />}
-                title="Freshness explícito"
-                description="Última coleta e última consolidação exibidas em tela. Sem ilusão de real-time."
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Screenshots */}
-        <section className="mx-auto max-w-6xl px-6 py-20">
-          <div className="mx-auto max-w-2xl text-center">
-            <Badge variant="secondary">Produto</Badge>
-            <h2 className="mt-4 text-3xl font-bold tracking-tight">
-              Veja a plataforma em acao
+            <h2 className="text-center text-3xl font-bold tracking-tight text-[#1E3A8A]">
+              A Solucao
             </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Dashboard consolidado, recomendacoes priorizadas e onboarding
-              self-service.
-            </p>
-          </div>
-          <div className="mt-10 grid gap-6 md:grid-cols-2">
-            <Card className="overflow-hidden border-border">
-              <div className="flex h-48 items-center justify-center bg-muted text-muted-foreground">
-                <p className="text-sm">Screenshot: Dashboard</p>
-              </div>
-              <CardContent className="p-4">
-                <p className="text-sm font-medium">Dashboard consolidado</p>
-                <p className="text-xs text-muted-foreground">
-                  Custos por Organization, OUs e contas com freshness.
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="overflow-hidden border-border">
-              <div className="flex h-48 items-center justify-center bg-muted text-muted-foreground">
-                <p className="text-sm">Screenshot: Recomendacoes</p>
-              </div>
-              <CardContent className="p-4">
-                <p className="text-sm font-medium">Recomendacoes priorizadas</p>
-                <p className="text-xs text-muted-foreground">
-                  Oportunidades de economia unificadas de 3 fontes AWS.
-                </p>
-              </CardContent>
-            </Card>
+            <div className="mt-12 grid gap-8 md:grid-cols-3">
+              <SolutionCard
+                step="1"
+                icon={<Brain className="h-8 w-8 text-[#2563EB]" />}
+                title="IA Avancada"
+                description="Detecta padroes, desperdicios e oportunidades de economia automaticamente com inteligencia artificial."
+              />
+              <SolutionCard
+                step="2"
+                icon={<CloudCog className="h-8 w-8 text-[#2563EB]" />}
+                title="Analisamos sua nuvem"
+                description="Identificamos desperdicios, oportunidades e priorizamos acoes de economia na sua AWS Organization."
+              />
+              <SolutionCard
+                step="3"
+                icon={<TrendingDown className="h-8 w-8 text-[#2563EB]" />}
+                title="Reduza seus custos"
+                description="Economias de magnitude em seus gastos com a economia. Recomendacoes priorizadas com estimated savings."
+              />
+            </div>
           </div>
         </section>
 
-        {/* CTA */}
-        <section className="mx-auto max-w-6xl px-6 py-20">
-          <Card className="overflow-hidden border-border bg-[#1E3A8A] text-white">
-            <CardContent className="flex flex-col items-start gap-6 p-10 md:flex-row md:items-center md:justify-between">
-              <div>
-                <h3 className="text-2xl font-bold">
-                  Comece agora — trial de 90 dias, sem cartão
+        {/* Como Funciona */}
+        <section className="relative overflow-hidden bg-gradient-to-br from-[#1E3A8A] via-[#2563EB] to-[#38BDF8] text-white">
+          <div className="absolute inset-0 opacity-20 [background:radial-gradient(ellipse_at_top_left,#5EEAD4,transparent_50%)]" />
+          <div className="relative mx-auto max-w-6xl px-6 py-20">
+            <h2 className="text-3xl font-bold tracking-tight">
+              Como Funciona
+            </h2>
+            <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+              {/* Step 1 */}
+              <div className="rounded-2xl bg-white/10 p-6 backdrop-blur-sm">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white/20">
+                  <span className="text-lg font-bold">aws</span>
+                </div>
+                <h3 className="text-lg font-semibold">
+                  1. Conecte sua conta AWS
                 </h3>
-                <p className="mt-2 text-white/80">
-                  Integre sua AWS Organization e veja economia mensurável na
-                  primeira semana.
+                <p className="mt-2 text-sm text-white/70">
+                  Conecte sua AWS Organization com nosso template CloudFormation
+                  seguro.
                 </p>
               </div>
-              <Button asChild size="lg" className="bg-positive text-white hover:bg-positive/90">
-                <Link href="/signup">Criar minha conta</Link>
-              </Button>
-            </CardContent>
-          </Card>
+
+              {/* Step 2 */}
+              <div className="rounded-2xl bg-white/10 p-6 backdrop-blur-sm">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white/20">
+                  <CloudCog className="h-6 w-6" />
+                </div>
+                <h3 className="text-lg font-semibold">
+                  2. Analisamos sua nuvem
+                </h3>
+                <p className="mt-2 text-sm text-white/70">
+                  Detectamos desperdicios e oportunidades de economia
+                  automaticamente.
+                </p>
+              </div>
+
+              {/* Pricing - Pro */}
+              <div className="rounded-2xl bg-white p-6 text-[#1E293B]">
+                <div className="text-center">
+                  <h3 className="text-lg font-bold text-[#1E3A8A]">Pro</h3>
+                  <p className="mt-2">
+                    <span className="text-3xl font-bold text-[#1E3A8A]">
+                      R$ 299
+                    </span>
+                    <span className="text-sm text-gray-500">/mes</span>
+                  </p>
+                  <ul className="mt-4 space-y-2 text-left text-sm">
+                    <li className="flex items-start gap-2">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#34D399]" />
+                      Identificacao desperdicio
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#34D399]" />
+                      Analise e recomendacoes
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#34D399]" />
+                      Dashboard completo
+                    </li>
+                  </ul>
+                  <Button
+                    asChild
+                    className="mt-6 w-full bg-[#34D399] text-white hover:bg-[#2CC085]"
+                  >
+                    <Link href="/signup">Comece gratis</Link>
+                  </Button>
+                </div>
+              </div>
+
+              {/* Pricing - Empresarial */}
+              <div className="rounded-2xl bg-[#0F172A] p-6 text-white">
+                <div className="text-center">
+                  <h3 className="text-lg font-bold">Empresarial</h3>
+                  <p className="mt-2 text-sm text-white/70">Contate</p>
+                  <ul className="mt-4 space-y-2 text-left text-sm">
+                    <li className="flex items-start gap-2">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#34D399]" />
+                      Multi-contas ilimitadas
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#34D399]" />
+                      Suporte dedicado
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#34D399]" />
+                      Integracao customizada
+                    </li>
+                  </ul>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="mt-6 w-full border-[#34D399] text-[#34D399] hover:bg-[#34D399]/10"
+                  >
+                    <Link href="/signup">Comece gratis</Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Final */}
+        <section className="mx-auto max-w-6xl px-6 py-20">
+          <div className="rounded-2xl bg-gradient-to-r from-[#1E3A8A] to-[#2563EB] p-10 text-center text-white md:p-16">
+            <h3 className="text-3xl font-bold">
+              Comece agora — trial de 90 dias, sem cartao
+            </h3>
+            <p className="mx-auto mt-4 max-w-xl text-white/80">
+              Integre sua AWS Organization e veja economia mensuravel na
+              primeira semana.
+            </p>
+            <Button
+              asChild
+              size="lg"
+              className="mt-8 bg-[#34D399] text-white hover:bg-[#2CC085] shadow-lg"
+            >
+              <Link href="/signup">Criar minha conta</Link>
+            </Button>
+          </div>
         </section>
       </main>
       <SiteFooter />
@@ -210,7 +285,7 @@ export default async function LandingPage() {
   );
 }
 
-function Feature({
+function ProblemCard({
   icon,
   title,
   description,
@@ -220,14 +295,40 @@ function Feature({
   description: string;
 }) {
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex h-10 w-10 items-center justify-center rounded-md bg-accent text-accent-foreground">
-          {icon}
-        </div>
-        <CardTitle className="mt-3">{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
-    </Card>
+    <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-sm text-center">
+      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F0F9FF]">
+        {icon}
+      </div>
+      <h3 className="mt-5 text-lg font-semibold text-[#1E293B]">{title}</h3>
+      <p className="mt-3 text-sm leading-relaxed text-gray-500">
+        {description}
+      </p>
+    </div>
+  );
+}
+
+function SolutionCard({
+  step,
+  icon,
+  title,
+  description,
+}: {
+  step: string;
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-gray-100 bg-white p-8 text-center shadow-sm">
+      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#EFF6FF]">
+        {icon}
+      </div>
+      <h3 className="mt-5 text-lg font-semibold text-[#1E293B]">
+        {step}. {title}
+      </h3>
+      <p className="mt-3 text-sm leading-relaxed text-gray-500">
+        {description}
+      </p>
+    </div>
   );
 }
