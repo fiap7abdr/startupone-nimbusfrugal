@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
-import { slugify } from "@/lib/utils";
+import { generateTenantSlug } from "@/lib/utils";
 import { createTenantSchema } from "@/lib/validations";
 import { Building2 } from "lucide-react";
 
@@ -35,12 +35,7 @@ async function createTenant(formData: FormData) {
   }
   const { name: tenantName } = parsed.data;
 
-  let slug = slugify(tenantName);
-  let suffix = 0;
-  while (await prisma.tenant.findUnique({ where: { slug } })) {
-    suffix += 1;
-    slug = `${slugify(tenantName)}-${suffix}`;
-  }
+  const slug = generateTenantSlug(tenantName);
 
   const trialEndsAt = new Date();
   trialEndsAt.setDate(trialEndsAt.getDate() + 90);

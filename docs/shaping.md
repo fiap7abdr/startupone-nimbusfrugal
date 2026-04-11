@@ -17,7 +17,7 @@ shaping: true
 | R1.5 | Signup cria apenas User (sem tenant); tenant criado em etapa separada | Must-have |
 | **R2** | **Multi-tenancy** | Must-have |
 | R2.1 | Usuario sem tenant e redirecionado para criar tenant apos login | Must-have |
-| R2.2 | Slug unico por tenant | Must-have |
+| R2.2 | Slug globalmente unico por tenant (com sufixo aleatorio) | Must-have |
 | R2.3 | Convites para membros com grupo owner/read via link com token | Must-have |
 | R2.4 | Isolamento de dados por tenant em todas as entidades | Must-have |
 | R2.5 | Usuario pode pertencer a multiplos tenants | Must-have |
@@ -76,39 +76,43 @@ Shape A was selected and implemented in the bootstrap phase.
 
 | Req | Requirement | Status | A |
 |-----|-------------|--------|---|
-| R0 | Plataforma FinOps SaaS multi-tenant com onboarding self-service | Core goal | ✅ |
-| R1.1 | Magic link via Resend | Must-have | ✅ |
-| R1.2 | 3 perfis: Admin Geral, Owner, Read | Must-have | ✅ |
-| R1.3 | Bootstrap one-shot `/nimbus-setup` | Must-have | ✅ |
-| R1.4 | Middleware protege rotas | Must-have | ✅ |
-| R2.1 | Signup cria Tenant + Owner + TRIAL | Must-have | ✅ |
-| R2.2 | Slug único | Must-have | ✅ |
-| R2.3 | Convites para membros | Must-have | ✅ |
-| R2.4 | Isolamento por tenant | Must-have | ✅ |
-| R3.1 | Wizard registra AWS Organization | Must-have | ✅ |
-| R3.2 | CloudFormation template com IAM Role | Must-have | ✅ |
-| R3.3 | Trust policy com Account ID da Nimbus | Must-have | ✅ |
-| R3.4 | 7 conectores | Must-have | ✅ |
-| R4.1 | Listagem de integrações com status | Must-have | ✅ |
-| R4.2 | Health check com IntegrationTestResult | Must-have | ✅ |
-| R4.3 | Health check descobre OUs/contas | Must-have | ✅ |
-| R5.1 | Dashboard consolidado + freshness | Must-have | ✅ |
-| R5.2 | Árvore OUs/contas | Must-have | ✅ |
-| R5.3 | Recomendações priorizadas | Must-have | ✅ |
-| R5.4 | Data freshness sempre exibido | Must-have | ✅ |
-| R6.1 | Painel admin completo | Must-have | ✅ |
-| R6.2 | Impersonation com audit | Must-have | ✅ |
-| R6.3 | Convite de admins | Must-have | ✅ |
-| R7.1 | TRIAL 90 dias ilimitado | Must-have | ✅ |
-| R7.2 | PRO 0,5% do gasto | Nice-to-have | ❌ |
-| R7.3 | Status billing lifecycle | Must-have | ✅ |
-| R8.1 | Batch 24h assíncrono | Must-have | ❌ |
-| R8.2 | CollectionBatch com status | Must-have | ✅ |
-| R8.3 | Freshness delay por conector | Must-have | ✅ |
+| R0 | Plataforma FinOps SaaS multi-tenant com onboarding self-service para AWS | Core goal | ✅ |
+| R1.1 | Magic link via Resend (sem senha) + Google OAuth | Must-have | ✅ |
+| R1.2 | 3 perfis: Admin Geral, Owner do Tenant, Read | Must-have | ✅ |
+| R1.3 | Bootstrap one-shot via Google OAuth para criar primeiro Admin Geral (`/nimbus-setup`) | Must-have | ✅ |
+| R1.4 | Middleware protege rotas `/app/*` e `/admin/*` (exceto `/admin/login`) | Must-have | ✅ |
+| R1.5 | Signup cria apenas User (sem tenant); tenant criado em etapa separada | Must-have | ✅ |
+| R2.1 | Usuario sem tenant e redirecionado para criar tenant apos login | Must-have | ✅ |
+| R2.2 | Slug globalmente unico por tenant (com sufixo aleatorio) | Must-have | ✅ |
+| R2.3 | Convites para membros com grupo owner/read via link com token | Must-have | ✅ |
+| R2.4 | Isolamento de dados por tenant em todas as entidades | Must-have | ✅ |
+| R2.5 | Usuario pode pertencer a multiplos tenants | Must-have | ✅ |
+| R2.6 | Tenant switcher no sidebar com cookie `active-tenant-id` | Must-have | ✅ |
+| R2.7 | Aceite de convite em `/invitations/[token]` (logado aceita direto; nao logado redireciona para login com callback) | Must-have | ✅ |
+| R3.1 | Wizard registra AWS Organization (nome, ID, management account) | Must-have | ✅ |
+| R3.2 | Gera template CloudFormation com IAM Role + trust policy + External ID unico | Must-have | ✅ |
+| R3.3 | Trust policy referencia AWS Account ID da plataforma Nimbus | Must-have | ✅ |
+| R3.4 | 7 conectores: Organizations, CUR, Cost Explorer, Cost Optimization Hub, Compute Optimizer, Trusted Advisor, SSM Explorer | Must-have | ✅ |
+| R4.1 | Listagem de integracoes por tenant com status (pending/active/error/partial) | Must-have | ✅ |
+| R4.2 | Health check simula validacao de Role ARN e cria IntegrationTestResult | Must-have | ✅ |
+| R4.3 | Health check ativa integracao e descobre OUs/contas placeholder | Must-have | ✅ |
+| R5.1 | Dashboard consolidado com metricas e freshness de dados | Must-have | ✅ |
+| R5.2 | Arvore de OUs/contas descobertas por Organization | Must-have | ✅ |
+| R5.3 | Recomendacoes priorizadas (low/medium/high) com estimated savings | Must-have | ✅ |
+| R5.4 | Data freshness sempre exibido (fresh/stale/delayed/unknown) | Must-have | ✅ |
+| R6.1 | Painel admin: overview, tenants, integracoes, batches, admin-users | Must-have | ✅ |
+| R6.2 | Impersonation de tenant com reason e audit trail | Must-have | ✅ |
+| R6.3 | Convite de novos admins | Must-have | ✅ |
+| R7.1 | TRIAL: 90 dias, tudo ilimitado | Must-have | ✅ |
+| R7.2 | PRO: 0,5% do gasto mensal consolidado AWS | Nice-to-have | ❌ |
+| R7.3 | Status de billing: trial → active → past_due → canceled | Must-have | ✅ |
+| R8.1 | Batch assincrono a cada 24h (nao real-time) | Must-have | ❌ |
+| R8.2 | CollectionBatch com status (scheduled/running/success/failed/partial) | Must-have | ✅ |
+| R8.3 | Freshness delay calculado por conector | Must-have | ✅ |
 
 **Notes:**
-- A fails R7.2: cálculo real de 0,5% do gasto não implementado (A7 flagged ⚠️)
-- A fails R8.1: cron job real para coleta diária não implementado (A8 flagged ⚠️)
+- A fails R7.2: calculo real de 0,5% do gasto nao implementado (A7 flagged ⚠️)
+- A fails R8.1: cron job real para coleta diaria nao implementado (A8 flagged ⚠️)
 
 ---
 

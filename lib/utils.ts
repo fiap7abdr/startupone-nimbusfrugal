@@ -32,3 +32,9 @@ export function formatDate(value: Date | string | null | undefined): string {
 export function randomExternalId(): string {
   return `nimbus-${crypto.randomUUID()}`;
 }
+
+export function generateTenantSlug(name: string): string {
+  const base = slugify(name).slice(0, 30);
+  const suffix = crypto.randomUUID().slice(0, 8);
+  return base ? `${base}-${suffix}` : suffix;
+}
