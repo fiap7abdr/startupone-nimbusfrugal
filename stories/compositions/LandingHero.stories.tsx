@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { Button } from "@/components/ui/button";
+import { SplitText } from "@/components/ui/split-text";
 import { Check } from "lucide-react";
 
 function LandingHeroComposition() {
@@ -31,13 +32,27 @@ function LandingHeroComposition() {
         <div className="absolute inset-0 opacity-30 [background:radial-gradient(ellipse_at_bottom_right,#5EEAD4,transparent_60%)]" />
         <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-6 py-20 md:grid-cols-2 md:py-28">
           <div>
-            <h1 className="text-4xl font-bold leading-tight tracking-tight md:text-5xl">
-              Controle de custos em nuvem, inteligencia para economizar
-            </h1>
-            <p className="mt-6 max-w-lg text-lg text-white/80">
-              Otimizamos seus custos com a AWS atraves de IA avancada,
-              visibilidade completa e priorizacao de economia.
-            </p>
+            <SplitText
+              text="Controle de custos em nuvem, inteligencia para economizar"
+              className="text-4xl font-bold leading-tight tracking-tight md:text-5xl"
+              tag="h1"
+              splitType="words"
+              delay={80}
+              duration={0.7}
+              from={{ opacity: 0, y: 40 }}
+              to={{ opacity: 1, y: 0 }}
+            />
+            <SplitText
+              text="Otimizamos seus custos com a AWS atraves de IA avancada, visibilidade completa e priorizacao de economia."
+              className="mt-6 max-w-lg text-lg text-white/80"
+              tag="p"
+              splitType="words"
+              delay={30}
+              duration={0.5}
+              from={{ opacity: 0, y: 20 }}
+              to={{ opacity: 1, y: 0 }}
+              threshold={0.3}
+            />
             <div className="mt-8">
               <Button
                 size="lg"

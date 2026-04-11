@@ -36,6 +36,11 @@
 - Prisma only reads `.env`, not `.env.local`. Sync with `cp .env.local .env` if needed.
 - `npm run db:push` to sync schema with Neon.
 
+## Middleware Constraints
+- Edge Function limit: < 1MB on Vercel free tier
+- NEVER import auth from Auth.js in middleware (pulls Prisma+Resend+providers ~1.01MB)
+- Middleware checks authjs.session-token cookie directly instead
+
 ## Deploy
 - Vercel (auto-deploy from GitHub)
 - Domain: nimbusfrugal.cloud
