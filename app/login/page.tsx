@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { signIn } from "@/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,18 +12,7 @@ import { Label } from "@/components/ui/label";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
 import Link from "next/link";
-
-async function loginWithEmail(formData: FormData) {
-  "use server";
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
-  if (!email) return;
-  await signIn("resend", { email, redirectTo: "/app" });
-}
-
-async function loginWithGoogle() {
-  "use server";
-  await signIn("google", { redirectTo: "/app" });
-}
+import { loginWithGoogle, loginWithEmail } from "@/lib/auth-actions";
 
 export default function LoginPage() {
   return (

@@ -18,6 +18,10 @@ const config: StorybookConfig = {
       ...(config.resolve.alias ?? {}),
       "@": resolve(__dirname, ".."),
     };
+    config.esbuild = {
+      ...config.esbuild,
+      jsx: "automatic",
+    };
     return config;
   },
 };

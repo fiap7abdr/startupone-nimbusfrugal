@@ -1,12 +1,11 @@
 import { redirect } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
+import { SignupModal } from "@/components/marketing/signup-modal";
 import {
-  Trash2,
   EyeOff,
   Wrench,
   Brain,
@@ -36,13 +35,16 @@ export default async function LandingPage() {
                 visibilidade completa e priorizacao de economia.
               </p>
               <div className="mt-8">
-                <Button
-                  asChild
-                  size="lg"
-                  className="bg-[#34D399] text-white hover:bg-[#2CC085] shadow-lg"
-                >
-                  <Link href="/signup">Comece gratis</Link>
-                </Button>
+                <SignupModal
+                  trigger={
+                    <Button
+                      size="lg"
+                      className="bg-[#34D399] text-white hover:bg-[#2CC085] shadow-lg"
+                    >
+                      Comece gratis
+                    </Button>
+                  }
+                />
               </div>
             </div>
 
@@ -113,7 +115,15 @@ export default async function LandingPage() {
           </h2>
           <div className="mt-12 grid gap-8 md:grid-cols-3">
             <ProblemCard
-              icon={<Trash2 className="h-8 w-8 text-[#38BDF8]" />}
+              icon={
+                <Image
+                  src="/icon-desperdicio.png"
+                  alt="Desperdicio"
+                  width={80}
+                  height={72}
+                  className="object-contain"
+                />
+              }
               title="Desperdicio"
               description="Recursos nao utilizados geram custos desnecessarios. Instancias ociosas, volumes orfaos e reservas expiradas consomem orcamento silenciosamente."
             />
@@ -230,12 +240,13 @@ export default async function LandingPage() {
                       Tudo ilimitado durante 90 dias
                     </li>
                   </ul>
-                  <Button
-                    asChild
-                    className="mt-6 w-full bg-[#34D399] text-white hover:bg-[#2CC085]"
-                  >
-                    <Link href="/signup">Comecar gratis</Link>
-                  </Button>
+                  <SignupModal
+                    trigger={
+                      <Button className="mt-6 w-full bg-[#34D399] text-white hover:bg-[#2CC085]">
+                        Comecar gratis
+                      </Button>
+                    }
+                  />
                 </div>
               </div>
 
@@ -275,25 +286,28 @@ export default async function LandingPage() {
                       Billing baseado em 10% da economia realizada
                     </li>
                   </ul>
-                  <Button
-                    asChild
-                    variant="outline"
-                    className="mt-6 w-full border-[#34D399] text-[#34D399] hover:bg-[#34D399]/10"
-                  >
-                    <Link href="/signup">Comecar no Pro</Link>
-                  </Button>
+                  <SignupModal
+                    trigger={
+                      <Button
+                        variant="outline"
+                        className="mt-6 w-full border-[#34D399] text-[#34D399] hover:bg-[#34D399]/10"
+                      >
+                        Comecar no Pro
+                      </Button>
+                    }
+                  />
                 </div>
               </div>
             </div>
             <p className="mt-8 text-center text-sm text-white/60">
               Precisa de condicoes especificas para grandes contas?{" "}
-              <Link
-                href="/signup"
-                className="font-medium text-[#34D399] hover:underline"
-              >
-                Entre em contato
-              </Link>
-              .
+              <SignupModal
+                trigger={
+                  <button className="font-medium text-[#34D399] hover:underline">
+                    Entre em contato
+                  </button>
+                }
+              />
             </p>
           </div>
         </section>
@@ -308,13 +322,16 @@ export default async function LandingPage() {
               Integre sua AWS Organization e veja economia mensuravel na
               primeira semana.
             </p>
-            <Button
-              asChild
-              size="lg"
-              className="mt-8 bg-[#34D399] text-white hover:bg-[#2CC085] shadow-lg"
-            >
-              <Link href="/signup">Criar minha conta</Link>
-            </Button>
+            <SignupModal
+              trigger={
+                <Button
+                  size="lg"
+                  className="mt-8 bg-[#34D399] text-white hover:bg-[#2CC085] shadow-lg"
+                >
+                  Criar minha conta
+                </Button>
+              }
+            />
           </div>
         </section>
       </main>
@@ -334,7 +351,7 @@ function ProblemCard({
 }) {
   return (
     <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-sm text-center">
-      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F0F9FF]">
+      <div className="mx-auto flex h-20 w-20 items-center justify-center">
         {icon}
       </div>
       <h3 className="mt-5 text-lg font-semibold text-[#1E293B]">{title}</h3>

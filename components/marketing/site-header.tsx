@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import { LoginModal } from "@/components/marketing/login-modal";
+import { SignupModal } from "@/components/marketing/signup-modal";
 
 export function SiteHeader() {
   return (
@@ -18,9 +19,8 @@ export function SiteHeader() {
           </span>
         </Link>
         <div className="flex items-center gap-3">
-          <Button asChild size="sm">
-            <Link href="/signup">Comecar gratis</Link>
-          </Button>
+          <LoginModal />
+          <SignupModal />
         </div>
       </div>
     </header>

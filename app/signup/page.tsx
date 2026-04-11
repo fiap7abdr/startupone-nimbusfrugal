@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,34 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
-import { prisma } from "@/lib/prisma";
-import { signIn } from "@/auth";
-import { signupSchema } from "@/lib/validations";
-
-async function createAccount(formData: FormData) {
-  "use server";
-
-  const parsed = signupSchema.safeParse({
-    name: formData.get("name"),
-    email: formData.get("email"),
-  });
-  if (!parsed.success) {
-    redirect("/signup?error=missing");
-  }
-  const { name, email } = parsed.data;
-
-  const existing = await prisma.user.findUnique({ where: { email } });
-  if (!existing) {
-    await prisma.user.create({ data: { name, email } });
-  }
-
-  await signIn("resend", { email, redirectTo: "/app" });
-}
-
-async function signupWithGoogle() {
-  "use server";
-  await signIn("google", { redirectTo: "/app" });
-}
+import { createAccount, signupWithGoogle } from "@/lib/auth-actions";
 
 export default function SignupPage({
   searchParams,
