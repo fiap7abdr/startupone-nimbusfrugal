@@ -142,6 +142,44 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* Screenshots */}
+        <section className="mx-auto max-w-6xl px-6 py-20">
+          <div className="mx-auto max-w-2xl text-center">
+            <Badge variant="secondary">Produto</Badge>
+            <h2 className="mt-4 text-3xl font-bold tracking-tight">
+              Veja a plataforma em acao
+            </h2>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Dashboard consolidado, recomendacoes priorizadas e onboarding
+              self-service.
+            </p>
+          </div>
+          <div className="mt-10 grid gap-6 md:grid-cols-2">
+            <Card className="overflow-hidden border-border">
+              <div className="flex h-48 items-center justify-center bg-muted text-muted-foreground">
+                <p className="text-sm">Screenshot: Dashboard</p>
+              </div>
+              <CardContent className="p-4">
+                <p className="text-sm font-medium">Dashboard consolidado</p>
+                <p className="text-xs text-muted-foreground">
+                  Custos por Organization, OUs e contas com freshness.
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="overflow-hidden border-border">
+              <div className="flex h-48 items-center justify-center bg-muted text-muted-foreground">
+                <p className="text-sm">Screenshot: Recomendacoes</p>
+              </div>
+              <CardContent className="p-4">
+                <p className="text-sm font-medium">Recomendacoes priorizadas</p>
+                <p className="text-xs text-muted-foreground">
+                  Oportunidades de economia unificadas de 3 fontes AWS.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
         {/* CTA */}
         <section className="mx-auto max-w-6xl px-6 py-20">
           <Card className="overflow-hidden border-border bg-[#1E3A8A] text-white">
