@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { TenantSwitcher } from "@/components/app/tenant-switcher";
+import { LogoutButton } from "@/components/app/logout-button";
 import {
   LayoutDashboard,
   Cable,
@@ -13,7 +14,6 @@ import {
   Settings,
   Network,
   Rocket,
-  LogOut,
 } from "lucide-react";
 
 const NAV = [
@@ -86,15 +86,7 @@ export function AppSidebar({
         })}
       </nav>
       <div className="border-t border-white/10 p-3">
-        <form action="/api/auth/signout" method="post">
-          <button
-            type="submit"
-            className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-white/80 hover:bg-white/10"
-          >
-            <LogOut className="h-4 w-4" />
-            Sair
-          </button>
-        </form>
+        <LogoutButton />
       </div>
     </aside>
   );
