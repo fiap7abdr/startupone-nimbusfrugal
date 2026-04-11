@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { signIn } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
@@ -11,7 +12,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Lock } from "lucide-react";
 
 async function adminLogin(formData: FormData) {
   "use server";
@@ -38,10 +38,14 @@ export default async function AdminLoginPage({
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#0f1b3f] p-6">
       <Card className="w-full max-w-md">
-        <CardHeader>
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent text-accent-foreground">
-            <Lock className="h-6 w-6" />
-          </div>
+        <CardHeader className="items-center">
+          <Image
+            src="/logo-128.png"
+            alt="Nimbus Frugal"
+            width={80}
+            height={80}
+            className="mb-2"
+          />
           <CardTitle className="mt-4">Acesso administrativo</CardTitle>
           <CardDescription>
             Área restrita a Administradores Gerais da Nimbus Frugal.

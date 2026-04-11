@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { signIn } from "@/auth";
@@ -9,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ShieldAlert } from "lucide-react";
 
 async function setupWithGoogle() {
   "use server";
@@ -29,10 +29,14 @@ export default async function NimbusSetupPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#0f1b3f] p-6">
       <Card className="w-full max-w-xl border-border">
-        <CardHeader>
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent text-accent-foreground">
-            <ShieldAlert className="h-6 w-6" />
-          </div>
+        <CardHeader className="items-center">
+          <Image
+            src="/logo-200.png"
+            alt="Nimbus Frugal"
+            width={120}
+            height={120}
+            className="mb-2"
+          />
           <CardTitle className="mt-4">
             Bootstrap da plataforma Nimbus Frugal
           </CardTitle>

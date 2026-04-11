@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { signIn } from "@/auth";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,7 +33,14 @@ export default function LoginPage() {
       <main className="flex-1">
         <section className="mx-auto max-w-md px-6 py-20">
           <Card>
-            <CardHeader>
+            <CardHeader className="items-center">
+              <Image
+                src="/logo-128.png"
+                alt="Nimbus Frugal"
+                width={80}
+                height={80}
+                className="mb-2"
+              />
               <CardTitle>Entrar na Nimbus Frugal</CardTitle>
               <CardDescription>
                 Use sua conta Google ou receba um link de acesso por e-mail.

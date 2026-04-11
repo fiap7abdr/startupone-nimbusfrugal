@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,6 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { generateTenantSlug } from "@/lib/utils";
 import { createTenantSchema } from "@/lib/validations";
-import { Building2 } from "lucide-react";
 
 async function createTenant(formData: FormData) {
   "use server";
@@ -98,10 +98,14 @@ export default async function NewTenantPage({
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-6">
       <Card className="w-full max-w-md">
-        <CardHeader>
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent text-accent-foreground">
-            <Building2 className="h-6 w-6" />
-          </div>
+        <CardHeader className="items-center">
+          <Image
+            src="/logo-128.png"
+            alt="Nimbus Frugal"
+            width={80}
+            height={80}
+            className="mb-2"
+          />
           <CardTitle className="mt-4">Criar seu tenant</CardTitle>
           <CardDescription>
             Um tenant representa sua organizacao na Nimbus Frugal. Voce tera 90

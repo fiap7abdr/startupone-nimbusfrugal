@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -52,7 +53,14 @@ export default function SignupPage({
       <main className="flex-1">
         <section className="mx-auto max-w-md px-6 py-20">
           <Card>
-            <CardHeader>
+            <CardHeader className="items-center">
+              <Image
+                src="/logo-128.png"
+                alt="Nimbus Frugal"
+                width={80}
+                height={80}
+                className="mb-2"
+              />
               <CardTitle>Criar conta Nimbus Frugal</CardTitle>
               <CardDescription>
                 Comece o trial de 90 dias. Crie seu tenant apos o cadastro.

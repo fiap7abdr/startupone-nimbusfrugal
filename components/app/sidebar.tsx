@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { TenantSwitcher } from "@/components/app/tenant-switcher";
@@ -13,7 +14,6 @@ import {
   Network,
   Rocket,
   LogOut,
-  CloudCog,
 } from "lucide-react";
 
 const NAV = [
@@ -44,9 +44,13 @@ export function AppSidebar({
   return (
     <aside className="flex h-screen w-64 flex-col bg-[#1E3A8A] text-white">
       <div className="flex h-16 items-center gap-2 border-b border-white/10 px-5">
-        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
-          <CloudCog className="h-4 w-4" />
-        </div>
+        <Image
+          src="/logo-40.png"
+          alt="Nimbus Frugal"
+          width={32}
+          height={32}
+          className="shrink-0"
+        />
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold">Nimbus Frugal</p>
           {tenants && activeTenantId ? (
