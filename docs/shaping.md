@@ -43,7 +43,7 @@ shaping: true
 | R6.3 | Convite de novos admins | Must-have |
 | **R7** | **Billing** | Must-have |
 | R7.1 | TRIAL: 90 dias, tudo ilimitado | Must-have |
-| R7.2 | PRO: 0,5% do gasto mensal consolidado AWS | Nice-to-have |
+| R7.2 | PRO: ao fim do mes soma estimated savings dos recursos identificados com potencial de economia e cobra 10% desse valor | Must-have |
 | R7.3 | Status de billing: trial → active → past_due → canceled | Must-have |
 | **R8** | **Coleta de dados** | Must-have |
 | R8.1 | Batch assíncrono a cada 24h (não real-time) | Must-have |
@@ -66,7 +66,7 @@ Shape A was selected and implemented in the bootstrap phase.
 | **A4** | **Integrações** — CRUD de Integration com 7 connectorTypes. Health check via Server Action: valida Role ARN → ativa integração → cria IntegrationTestResult → descobre OUs/contas placeholder → upsert DataFreshnessStatus. | |
 | **A5** | **Dashboard & Visibilidade** — `/app/dashboard` com métricas consolidadas + freshness badges. `/app/organization` com árvore OUs/contas. `/app/recommendations` com lista priorizada. | |
 | **A6** | **Admin Panel** — Route group `(protected)` com layout que chama `requireAdmin()`. Páginas: overview, tenants, integrations, batches, admin-users. `/admin/login` fora do group. | |
-| **A7** | **Billing** — BillingSubscription criada no signup (TRIAL, 90 dias). Modelo usage_percent para PRO. `/app/settings` para billing e preferências. | ⚠️ |
+| **A7** | **Billing** — BillingSubscription criada no signup (TRIAL, 90 dias). PRO: job mensal ao fim do mes soma estimated savings das recomendacoes identificadas e cobra 10% desse valor. `/app/settings` para billing e preferencias. | ⚠️ |
 | **A8** | **Coleta de Dados** — CollectionBatch model com scheduling. DataFreshnessStatus por conector por tenant. Cron job placeholder (não implementado real). | ⚠️ |
 | **A9** | **Design System** — Tokens tipados em TS → CSS variables geradas automaticamente. Tailwind 4 `@theme inline`. shadcn-style components com cva. Storybook 8 react-vite. | |
 
@@ -104,14 +104,14 @@ Shape A was selected and implemented in the bootstrap phase.
 | R6.2 | Impersonation de tenant com reason e audit trail | Must-have | ✅ |
 | R6.3 | Convite de novos admins | Must-have | ✅ |
 | R7.1 | TRIAL: 90 dias, tudo ilimitado | Must-have | ✅ |
-| R7.2 | PRO: 0,5% do gasto mensal consolidado AWS | Nice-to-have | ❌ |
+| R7.2 | PRO: ao fim do mes soma estimated savings dos recursos identificados com potencial de economia e cobra 10% desse valor | Must-have | ❌ |
 | R7.3 | Status de billing: trial → active → past_due → canceled | Must-have | ✅ |
 | R8.1 | Batch assincrono a cada 24h (nao real-time) | Must-have | ❌ |
 | R8.2 | CollectionBatch com status (scheduled/running/success/failed/partial) | Must-have | ✅ |
 | R8.3 | Freshness delay calculado por conector | Must-have | ✅ |
 
 **Notes:**
-- A fails R7.2: calculo real de 0,5% do gasto nao implementado (A7 flagged ⚠️)
+- A fails R7.2: job mensal que soma estimated savings das recomendacoes e cobra 10% nao implementado (A7 flagged ⚠️)
 - A fails R8.1: cron job real para coleta diaria nao implementado (A8 flagged ⚠️)
 
 ---
@@ -127,6 +127,6 @@ Shape A was selected and implemented in the bootstrap phase.
 - Git: main branch, single commit, github.com/fiap7abdr/startupone-nimbusfrugal
 
 ### Pending (Next Phases)
-- **A7 ⚠️** Lógica real de cálculo PRO (0,5% do gasto)
+- **A7 ⚠️** Job mensal de calculo PRO (soma estimated savings das recomendacoes, cobra 10%)
 - **A8 ⚠️** Cron job real para coleta diária AWS
 - Coleta real de dados AWS (atualmente só cria Integration + health check simulado)

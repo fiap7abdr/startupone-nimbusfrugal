@@ -17,26 +17,9 @@ export function SiteHeader() {
             Nimbus Frugal
           </span>
         </Link>
-        <nav className="hidden items-center gap-8 md:flex">
-          <Link
-            href="/pricing"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground"
-          >
-            Pricing
-          </Link>
-          <Link
-            href="/login"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground"
-          >
-            Entrar
-          </Link>
-        </nav>
         <div className="flex items-center gap-3">
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/login">Login</Link>
-          </Button>
           <Button asChild size="sm">
-            <Link href="/signup">Começar grátis</Link>
+            <Link href="/signup">Comecar gratis</Link>
           </Button>
         </div>
       </div>

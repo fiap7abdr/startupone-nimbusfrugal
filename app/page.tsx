@@ -195,56 +195,84 @@ export default async function LandingPage() {
                 </p>
               </div>
 
-              {/* Pricing - Pro */}
+              {/* Pricing - Trial */}
               <div className="rounded-2xl bg-white p-6 text-[#1E293B]">
                 <div className="text-center">
-                  <h3 className="text-lg font-bold text-[#1E3A8A]">Pro</h3>
+                  <h3 className="text-lg font-bold text-[#1E3A8A]">Trial</h3>
                   <p className="mt-2">
                     <span className="text-3xl font-bold text-[#1E3A8A]">
-                      R$ 299
+                      Gratis
                     </span>
-                    <span className="text-sm text-gray-500">/mes</span>
+                    <span className="text-sm text-gray-500"> por 90 dias</span>
+                  </p>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Toda a plataforma liberada enquanto voce valida o retorno.
                   </p>
                   <ul className="mt-4 space-y-2 text-left text-sm">
                     <li className="flex items-start gap-2">
                       <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#34D399]" />
-                      Identificacao desperdicio
+                      Ingestao AWS Organizations, CUR, Cost Explorer
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#34D399]" />
-                      Analise e recomendacoes
+                      Recomendacoes de Cost Optimization Hub, Compute Optimizer, Trusted Advisor
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#34D399]" />
-                      Dashboard completo
+                      Dashboards e freshness por conector
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#34D399]" />
+                      Convites de usuarios, grupos owner e read
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#34D399]" />
+                      Tudo ilimitado durante 90 dias
                     </li>
                   </ul>
                   <Button
                     asChild
                     className="mt-6 w-full bg-[#34D399] text-white hover:bg-[#2CC085]"
                   >
-                    <Link href="/signup">Comece gratis</Link>
+                    <Link href="/signup">Comecar gratis</Link>
                   </Button>
                 </div>
               </div>
 
-              {/* Pricing - Empresarial */}
+              {/* Pricing - Pro */}
               <div className="rounded-2xl bg-[#0F172A] p-6 text-white">
                 <div className="text-center">
-                  <h3 className="text-lg font-bold">Empresarial</h3>
-                  <p className="mt-2 text-sm text-white/70">Contate</p>
+                  <h3 className="text-lg font-bold">Pro</h3>
+                  <p className="mt-2">
+                    <span className="text-3xl font-bold">10%</span>
+                    <span className="text-sm text-white/70">
+                      {" "}da economia realizada
+                    </span>
+                  </p>
+                  <p className="mt-1 text-xs text-white/50">
+                    Ao fim do mes, somamos as economias identificadas nos
+                    seus recursos e cobramos 10%. So paga quando economiza.
+                  </p>
                   <ul className="mt-4 space-y-2 text-left text-sm">
                     <li className="flex items-start gap-2">
                       <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#34D399]" />
-                      Multi-contas ilimitadas
+                      Tudo do Trial, sem limite de tempo
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#34D399]" />
-                      Suporte dedicado
+                      Batches diarios consolidados e reprocessamento
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#34D399]" />
-                      Integracao customizada
+                      Workflow de acoes com owner, prioridade e auditoria
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#34D399]" />
+                      Excecoes com justificativa, aprovacao e expiracao
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#34D399]" />
+                      Billing baseado em 10% da economia realizada
                     </li>
                   </ul>
                   <Button
@@ -252,11 +280,21 @@ export default async function LandingPage() {
                     variant="outline"
                     className="mt-6 w-full border-[#34D399] text-[#34D399] hover:bg-[#34D399]/10"
                   >
-                    <Link href="/signup">Comece gratis</Link>
+                    <Link href="/signup">Comecar no Pro</Link>
                   </Button>
                 </div>
               </div>
             </div>
+            <p className="mt-8 text-center text-sm text-white/60">
+              Precisa de condicoes especificas para grandes contas?{" "}
+              <Link
+                href="/signup"
+                className="font-medium text-[#34D399] hover:underline"
+              >
+                Entre em contato
+              </Link>
+              .
+            </p>
           </div>
         </section>
 
