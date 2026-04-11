@@ -12,11 +12,15 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 import { requireTenant } from "@/lib/tenant";
-import { randomExternalId } from "@/lib/utils";
-import { buildNimbusCloudFormationTemplate } from "@/lib/aws-cloudformation";
+import { randomExternalId, connectorLabel } from "@/lib/utils";
+import {
+  buildNimbusCloudFormationTemplate,
+  connectorRoleName,
+  CONNECTOR_TYPES,
+} from "@/lib/aws-cloudformation";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { CheckCircle2, Circle } from "lucide-react";
+import { CheckCircle2, Circle, AlertCircle } from "lucide-react";
 import { registerOrgSchema } from "@/lib/validations";
 
 async function registerOrganization(formData: FormData) {
@@ -43,16 +47,16 @@ async function registerOrganization(formData: FormData) {
     },
   });
 
-  await prisma.integration.create({
-    data: {
+  await prisma.integration.createMany({
+    data: CONNECTOR_TYPES.map((connectorType) => ({
       tenantId: tenant.id,
-      connectorType: "aws_organizations",
+      connectorType,
       integrationMode: "read",
       externalId: randomExternalId(),
       trustPrincipalAccountId: platformAccountId,
       status: "pending",
       healthStatus: "unknown",
-    },
+    })),
   });
 
   await prisma.auditLog.create({
@@ -73,10 +77,11 @@ async function registerOrganization(formData: FormData) {
 export default async function OnboardingPage() {
   const { tenant } = await requireTenant();
 
-  const [org, integration, config] = await Promise.all([
+  const [org, integrations, config] = await Promise.all([
     prisma.awsOrganization.findFirst({ where: { tenantId: tenant.id } }),
-    prisma.integration.findFirst({
-      where: { tenantId: tenant.id, connectorType: "aws_organizations" },
+    prisma.integration.findMany({
+      where: { tenantId: tenant.id },
+      orderBy: { createdAt: "asc" },
     }),
     prisma.platformConfiguration.findFirst(),
   ]);
@@ -86,114 +91,169 @@ export default async function OnboardingPage() {
     process.env.NIMBUS_PLATFORM_AWS_ACCOUNT_ID ??
     "123456789012";
 
-  const externalId = integration?.externalId ?? "—";
-  const cfTemplate = integration
-    ? buildNimbusCloudFormationTemplate({
-        platformAccountId,
-        externalId,
-      })
-    : null;
+  const cfTemplate =
+    integrations.length > 0
+      ? buildNimbusCloudFormationTemplate({
+          platformAccountId,
+          connectors: integrations.map((i) => ({
+            connectorType: i.connectorType,
+            externalId: i.externalId,
+          })),
+        })
+      : null;
 
-  const steps = [
-    { key: "org", label: "Registrar organização AWS", done: !!org },
-    { key: "cf", label: "Aplicar CloudFormation e criar IAM Role", done: !!integration?.roleArn },
-    { key: "health", label: "Health check + descoberta de OUs/contas", done: integration?.status === "active" },
-  ];
+  const doneCount = integrations.filter((i) => i.status === "active").length;
+  const totalCount = integrations.length;
 
   return (
     <div>
       <PageHeader
         title="Onboarding AWS Organization"
-        description="Conecte a conta management da sua AWS Organization. A Nimbus Frugal assume uma role cross-account com External ID — nenhuma credencial é armazenada."
+        description="Conecte a conta management da sua AWS Organization. Cada conector usa uma IAM Role separada com permissoes least-privilege."
       />
 
-      <div className="mb-8 flex flex-col gap-3">
-        {steps.map((s, i) => (
-          <div key={s.key} className="flex items-center gap-3">
-            {s.done ? (
-              <CheckCircle2 className="h-5 w-5 text-positive" />
-            ) : (
-              <Circle className="h-5 w-5 text-muted-foreground" />
-            )}
-            <span
-              className={
-                s.done ? "text-sm text-muted-foreground line-through" : "text-sm font-medium"
-              }
-            >
-              {i + 1}. {s.label}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      {!org && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Passo 1 · Registrar sua AWS Organization</CardTitle>
-            <CardDescription>
-              Informe a organização e a conta management para que a Nimbus
-              descubra OUs e contas via AWS Organizations.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form action={registerOrganization} className="grid gap-4 md:grid-cols-3">
-              <div className="space-y-2">
-                <Label htmlFor="organizationName">Nome da organização</Label>
-                <Input id="organizationName" name="organizationName" required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="organizationId">Organization ID</Label>
-                <Input id="organizationId" name="organizationId" placeholder="o-xxxxxxxxxx" required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="managementAccountId">Management Account ID</Label>
-                <Input
-                  id="managementAccountId"
-                  name="managementAccountId"
-                  placeholder="123456789012"
-                  required
-                />
-              </div>
-              <div className="md:col-span-3">
-                <Button type="submit">Registrar organização</Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+      {/* Progress */}
+      {integrations.length > 0 && (
+        <div className="mb-6 flex items-center gap-3 text-sm text-muted-foreground">
+          <span>
+            Progresso: <strong className="text-foreground">{doneCount}/{totalCount}</strong> conectores ativos
+          </span>
+          {doneCount === totalCount && (
+            <Badge variant="positive">Onboarding completo</Badge>
+          )}
+        </div>
       )}
 
-      {org && integration && (
-        <Card>
+      <div className="space-y-6">
+        {/* Step: Register Organization */}
+        <Card className={org ? "border-positive/30 bg-positive/5" : ""}>
           <CardHeader>
-            <CardTitle>Passo 2 · Aplicar CloudFormation</CardTitle>
-            <CardDescription>
-              Execute o template abaixo na conta management. Ele cria uma IAM
-              Role cuja trust policy aponta para a conta AWS da Nimbus Frugal
-              com o External ID único do tenant.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-3 md:grid-cols-2">
-              <InfoRow label="Nimbus AWS Account ID (trust principal)" value={platformAccountId} mono />
-              <InfoRow label="External ID" value={externalId} mono />
-              <InfoRow label="Organização" value={org.organizationName} />
-              <InfoRow label="Status" value={<Badge variant="muted">{integration.status}</Badge>} />
+            <div className="flex items-center gap-3">
+              {org ? (
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-positive" />
+              ) : (
+                <Circle className="h-5 w-5 shrink-0 text-muted-foreground" />
+              )}
+              <div>
+                <CardTitle>Registrar AWS Organization</CardTitle>
+                <CardDescription>
+                  Informe a organização e a conta management.
+                </CardDescription>
+              </div>
             </div>
-            {cfTemplate && (
+          </CardHeader>
+          {!org && (
+            <CardContent>
+              <form action={registerOrganization} className="grid gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                  <Label htmlFor="organizationName">Nome da organização</Label>
+                  <Input id="organizationName" name="organizationName" required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="organizationId">Organization ID</Label>
+                  <Input id="organizationId" name="organizationId" placeholder="o-xxxxxxxxxx" required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="managementAccountId">Management Account ID</Label>
+                  <Input
+                    id="managementAccountId"
+                    name="managementAccountId"
+                    placeholder="123456789012"
+                    required
+                  />
+                </div>
+                <div className="md:col-span-3">
+                  <Button type="submit">Registrar organização</Button>
+                </div>
+              </form>
+            </CardContent>
+          )}
+          {org && (
+            <CardContent>
+              <div className="grid gap-3 text-sm md:grid-cols-3">
+                <InfoRow label="Organização" value={org.organizationName} />
+                <InfoRow label="Organization ID" value={org.organizationId} mono />
+                <InfoRow label="Management Account" value={org.managementAccountId} mono />
+              </div>
+            </CardContent>
+          )}
+        </Card>
+
+        {/* CloudFormation template */}
+        {cfTemplate && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Template CloudFormation</CardTitle>
+              <CardDescription>
+                Execute na conta management. Cria 7 IAM Roles (uma por conector),
+                cada uma com policy least-privilege e External ID único.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <InfoRow label="Nimbus AWS Account ID (trust principal)" value={platformAccountId} mono />
               <pre className="overflow-x-auto rounded-md border border-border bg-[#0f172a] p-4 text-xs text-white">
                 {cfTemplate}
               </pre>
-            )}
-            <p className="text-sm text-muted-foreground">
-              Depois de aplicar o template, volte para{" "}
-              <a href="/app/integrations" className="font-medium text-primary hover:underline">
-                Integrações
-              </a>{" "}
-              e informe o Role ARN gerado para rodar o health check.
-            </p>
-          </CardContent>
-        </Card>
-      )}
+              <p className="text-sm text-muted-foreground">
+                Após aplicar o template, configure o Role ARN de cada conector abaixo ou na página de{" "}
+                <a href="/app/integrations" className="font-medium text-primary hover:underline">
+                  Integrações
+                </a>.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Individual connector cards */}
+        {integrations.map((integration) => {
+          const isActive = integration.status === "active";
+          const isError = integration.status === "error";
+          const roleName = connectorRoleName(integration.connectorType);
+
+          return (
+            <Card
+              key={integration.id}
+              className={
+                isActive
+                  ? "border-positive/30 bg-positive/5"
+                  : isError
+                    ? "border-negative/30 bg-negative/5"
+                    : ""
+              }
+            >
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  {isActive ? (
+                    <CheckCircle2 className="h-5 w-5 shrink-0 text-positive" />
+                  ) : isError ? (
+                    <AlertCircle className="h-5 w-5 shrink-0 text-negative" />
+                  ) : (
+                    <Circle className="h-5 w-5 shrink-0 text-muted-foreground" />
+                  )}
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <CardTitle>{connectorLabel(integration.connectorType)}</CardTitle>
+                      <StatusBadge status={integration.status} />
+                    </div>
+                    <CardDescription>
+                      Role esperada: <span className="font-mono">{roleName}</span>
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="grid gap-3 text-sm md:grid-cols-2">
+                  <InfoRow label="External ID" value={integration.externalId} mono />
+                  <InfoRow label="Role ARN" value={integration.roleArn ?? "Não configurado"} mono />
+                </div>
+                {integration.lastError && (
+                  <p className="text-xs text-negative">Erro: {integration.lastError}</p>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -212,7 +272,17 @@ function InfoRow({
       <p className="text-xs uppercase tracking-wide text-muted-foreground">
         {label}
       </p>
-      <p className={mono ? "font-mono text-sm" : "text-sm"}>{value}</p>
+      <p className={mono ? "font-mono text-sm break-all" : "text-sm"}>{value}</p>
     </div>
   );
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const variant =
+    status === "active"
+      ? "positive"
+      : status === "error"
+        ? "negative"
+        : "muted";
+  return <Badge variant={variant}>{status}</Badge>;
 }

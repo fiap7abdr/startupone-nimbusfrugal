@@ -9,7 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { requireTenant } from "@/lib/tenant";
 import { prisma } from "@/lib/prisma";
-import { formatDate } from "@/lib/utils";
+import { formatDate, connectorLabel } from "@/lib/utils";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -101,7 +101,7 @@ export default async function DashboardPage() {
                     key={f.id}
                     className="flex items-center justify-between text-sm"
                   >
-                    <span className="font-medium">{f.connectorType}</span>
+                    <span className="font-medium">{connectorLabel(f.connectorType)}</span>
                     <div className="flex items-center gap-3">
                       <span className="text-muted-foreground">
                         {formatDate(f.lastCollectedAt)}

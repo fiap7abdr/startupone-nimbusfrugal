@@ -12,7 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { prisma } from "@/lib/prisma";
 import { requireTenant } from "@/lib/tenant";
-import { formatDate } from "@/lib/utils";
+import { formatDate, connectorLabel } from "@/lib/utils";
+import { connectorRoleName } from "@/lib/aws-cloudformation";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -172,49 +173,52 @@ export default async function IntegrationsPage() {
         </Card>
       ) : (
         <div className="space-y-4">
-          {integrations.map((i) => (
-            <Card key={i.id}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>{i.connectorType}</CardTitle>
-                    <CardDescription>
-                      Modo {i.integrationMode} · última coleta {formatDate(i.lastSuccessfulCollection)}
-                    </CardDescription>
+          {integrations.map((i) => {
+            const roleName = connectorRoleName(i.connectorType);
+            return (
+              <Card key={i.id}>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle>{connectorLabel(i.connectorType)}</CardTitle>
+                      <CardDescription>
+                        Role: <span className="font-mono">{roleName}</span> · Modo {i.integrationMode} · última coleta {formatDate(i.lastSuccessfulCollection)}
+                      </CardDescription>
+                    </div>
+                    <StatusBadge status={i.status} />
                   </div>
-                  <StatusBadge status={i.status} />
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-3 md:grid-cols-2">
-                  <Info label="External ID" value={i.externalId} mono />
-                  <Info label="Trust principal (Nimbus)" value={i.trustPrincipalAccountId} mono />
-                </div>
-                <form action={saveRoleArn} className="flex flex-col gap-3 md:flex-row md:items-end">
-                  <input type="hidden" name="integrationId" value={i.id} />
-                  <div className="flex-1 space-y-2">
-                    <Label htmlFor={`role-${i.id}`}>Role ARN</Label>
-                    <Input
-                      id={`role-${i.id}`}
-                      name="roleArn"
-                      defaultValue={i.roleArn ?? ""}
-                      placeholder="arn:aws:iam::123456789012:role/NimbusFrugalReadRole"
-                    />
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <Info label="External ID" value={i.externalId} mono />
+                    <Info label="Trust principal (Nimbus)" value={i.trustPrincipalAccountId} mono />
                   </div>
-                  <Button type="submit" variant="outline">
-                    Salvar Role ARN
-                  </Button>
-                </form>
-                <form action={runHealthCheck}>
-                  <input type="hidden" name="integrationId" value={i.id} />
-                  <Button type="submit">Executar health check</Button>
-                </form>
-                {i.lastError && (
-                  <p className="text-xs text-negative">Último erro: {i.lastError}</p>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+                  <form action={saveRoleArn} className="flex flex-col gap-3 md:flex-row md:items-end">
+                    <input type="hidden" name="integrationId" value={i.id} />
+                    <div className="flex-1 space-y-2">
+                      <Label htmlFor={`role-${i.id}`}>Role ARN</Label>
+                      <Input
+                        id={`role-${i.id}`}
+                        name="roleArn"
+                        defaultValue={i.roleArn ?? ""}
+                        placeholder={`arn:aws:iam::123456789012:role/${roleName}`}
+                      />
+                    </div>
+                    <Button type="submit" variant="outline">
+                      Salvar
+                    </Button>
+                  </form>
+                  <form action={runHealthCheck}>
+                    <input type="hidden" name="integrationId" value={i.id} />
+                    <Button type="submit">Executar health check</Button>
+                  </form>
+                  {i.lastError && (
+                    <p className="text-xs text-negative">Último erro: {i.lastError}</p>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>

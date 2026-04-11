@@ -2,7 +2,7 @@ import { PageHeader } from "@/components/app/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
-import { formatDate } from "@/lib/utils";
+import { formatDate, connectorLabel } from "@/lib/utils";
 
 export default async function AdminIntegrationsPage() {
   const integrations = await prisma.integration.findMany({
@@ -32,7 +32,7 @@ export default async function AdminIntegrationsPage() {
               {integrations.map((i) => (
                 <tr key={i.id} className="border-t border-border">
                   <td className="px-4 py-3 font-medium">{i.tenant.name}</td>
-                  <td className="px-4 py-3">{i.connectorType}</td>
+                  <td className="px-4 py-3">{connectorLabel(i.connectorType)}</td>
                   <td className="px-4 py-3">{i.integrationMode}</td>
                   <td className="px-4 py-3">
                     <Badge variant={i.status === "active" ? "positive" : "muted"}>

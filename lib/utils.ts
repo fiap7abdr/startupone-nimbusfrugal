@@ -38,3 +38,17 @@ export function generateTenantSlug(name: string): string {
   const suffix = crypto.randomUUID().slice(0, 8);
   return base ? `${base}-${suffix}` : suffix;
 }
+
+const CONNECTOR_LABELS: Record<string, string> = {
+  aws_organizations: "AWS Organizations",
+  cur: "CUR (Cost and Usage Report)",
+  cost_explorer: "Cost Explorer",
+  cost_optimization_hub: "Cost Optimization Hub",
+  compute_optimizer: "Compute Optimizer",
+  trusted_advisor: "Trusted Advisor",
+  ssm_explorer: "SSM Explorer",
+};
+
+export function connectorLabel(connectorType: string): string {
+  return CONNECTOR_LABELS[connectorType] ?? connectorType;
+}
