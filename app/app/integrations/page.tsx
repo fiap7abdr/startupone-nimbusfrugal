@@ -22,8 +22,13 @@ async function saveRoleArn(formData: FormData) {
   const integrationId = String(formData.get("integrationId") ?? "");
   const roleArn = String(formData.get("roleArn") ?? "").trim();
   if (!integrationId || !roleArn) return;
+  if (!/^arn:aws:iam::\d{12}:role\/.+$/.test(roleArn)) return;
+  const integration = await prisma.integration.findFirst({
+    where: { id: integrationId, tenantId: tenant.id },
+  });
+  if (!integration) return;
   await prisma.integration.update({
-    where: { id: integrationId },
+    where: { id: integration.id },
     data: { roleArn },
   });
   await prisma.auditLog.create({

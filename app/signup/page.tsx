@@ -9,17 +9,20 @@ import { SiteFooter } from "@/components/marketing/site-footer";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
 import { signIn } from "@/auth";
+import { signupSchema } from "@/lib/validations";
 
 async function createAccount(formData: FormData) {
   "use server";
 
-  const name = String(formData.get("name") ?? "").trim();
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
-  const tenantName = String(formData.get("tenant") ?? "").trim();
-
-  if (!name || !email || !tenantName) {
+  const parsed = signupSchema.safeParse({
+    name: formData.get("name"),
+    email: formData.get("email"),
+    tenant: formData.get("tenant"),
+  });
+  if (!parsed.success) {
     redirect("/signup?error=missing");
   }
+  const { name, email, tenant: tenantName } = parsed.data;
 
   const existing = await prisma.user.findUnique({ where: { email } });
   let user = existing;

@@ -30,7 +30,5 @@ export function formatDate(value: Date | string | null | undefined): string {
 }
 
 export function randomExternalId(): string {
-  return `nimbus-${Math.random().toString(36).slice(2, 10)}-${Math.random()
-    .toString(36)
-    .slice(2, 10)}`;
+  return `nimbus-${crypto.randomUUID()}`;
 }

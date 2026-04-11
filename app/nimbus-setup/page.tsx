@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn } from "@/auth";
 import { ShieldAlert } from "lucide-react";
+import { bootstrapSchema } from "@/lib/validations";
 
 async function createFirstAdmin(formData: FormData) {
   "use server";
@@ -20,9 +21,12 @@ async function createFirstAdmin(formData: FormData) {
     redirect("/admin/login");
   }
 
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
-  const name = String(formData.get("name") ?? "").trim();
-  if (!email || !name) redirect("/nimbus-setup?error=missing");
+  const parsed = bootstrapSchema.safeParse({
+    name: formData.get("name"),
+    email: formData.get("email"),
+  });
+  if (!parsed.success) redirect("/nimbus-setup?error=missing");
+  const { name, email } = parsed.data;
 
   const [admin] = await prisma.$transaction([
     prisma.adminUser.create({

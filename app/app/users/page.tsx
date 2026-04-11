@@ -14,13 +14,17 @@ import { prisma } from "@/lib/prisma";
 import { requireTenant } from "@/lib/tenant";
 import { formatDate } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
+import { inviteUserSchema } from "@/lib/validations";
 
 async function inviteUser(formData: FormData) {
   "use server";
   const { tenant, user } = await requireTenant();
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
-  const targetGroup = String(formData.get("group") ?? "read");
-  if (!email) return;
+  const parsed = inviteUserSchema.safeParse({
+    email: formData.get("email"),
+    group: formData.get("group") ?? "read",
+  });
+  if (!parsed.success) return;
+  const { email, group: targetGroup } = parsed.data;
 
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7);

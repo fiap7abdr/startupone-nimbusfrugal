@@ -17,16 +17,18 @@ import { buildNimbusCloudFormationTemplate } from "@/lib/aws-cloudformation";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { CheckCircle2, Circle } from "lucide-react";
+import { registerOrgSchema } from "@/lib/validations";
 
 async function registerOrganization(formData: FormData) {
   "use server";
   const { tenant } = await requireTenant();
-  const organizationName = String(formData.get("organizationName") ?? "").trim();
-  const organizationId = String(formData.get("organizationId") ?? "").trim();
-  const managementAccountId = String(
-    formData.get("managementAccountId") ?? "",
-  ).trim();
-  if (!organizationName || !organizationId || !managementAccountId) return;
+  const parsed = registerOrgSchema.safeParse({
+    organizationName: formData.get("organizationName"),
+    organizationId: formData.get("organizationId"),
+    managementAccountId: formData.get("managementAccountId"),
+  });
+  if (!parsed.success) return;
+  const { organizationName, organizationId, managementAccountId } = parsed.data;
 
   const platformAccountId =
     process.env.NIMBUS_PLATFORM_AWS_ACCOUNT_ID ?? "123456789012";
