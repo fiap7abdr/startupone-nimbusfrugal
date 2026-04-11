@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signIn } from "@/auth";
 import { ShieldAlert } from "lucide-react";
 import { bootstrapSchema } from "@/lib/validations";
 
@@ -29,8 +28,10 @@ async function createFirstAdmin(formData: FormData) {
   const { name, email } = parsed.data;
 
   const [admin] = await prisma.$transaction([
-    prisma.adminUser.create({
-      data: { email, name, role: "super_admin", status: "active" },
+    prisma.adminUser.upsert({
+      where: { email },
+      update: { name, role: "super_admin", status: "active" },
+      create: { email, name, role: "super_admin", status: "active" },
     }),
     prisma.user.upsert({
       where: { email },
@@ -79,7 +80,7 @@ async function createFirstAdmin(formData: FormData) {
     },
   });
 
-  await signIn("resend", { email, redirectTo: "/admin" });
+  redirect("/nimbus-setup/done");
 }
 
 export default async function NimbusSetupPage({
