@@ -23,10 +23,9 @@ Plataforma FinOps SaaS multi-tenant para AWS com atualizacao diaria e foco em vi
 ## Rotas
 
 ### Publico
-- `/` — landing page (Hero, Features, Screenshots, CTA, Footer)
-- `/pricing` — pricing Trial / Pro (0,5% do gasto consolidado)
-- `/signup` — criacao self-service de tenant
-- `/login` — Google OAuth ou magic link
+- `/` — landing page (Hero com SplitText animation, Problema, Solucao, Como Funciona, Pricing, CTA)
+- `/signup` — criacao self-service de conta (tambem acessivel via modal na landing)
+- `/login` — Google OAuth ou magic link (tambem acessivel via modal na landing)
 
 ### Bootstrap
 - `/nimbus-setup` — cria o primeiro Administrador Geral (uso unico)
@@ -40,6 +39,8 @@ Plataforma FinOps SaaS multi-tenant para AWS com atualizacao diaria e foco em vi
 - `/app/recommendations` — oportunidades priorizadas
 - `/app/users` — membros, convites, grupos owner/read
 - `/app/settings` — billing e preferencias
+- `/app/companies` — gerenciar empresas (criar, alternar, excluir) — somente Pro
+- `/app/upgrade` — upgrade de plano Trial → Pro com consentimento
 
 ### Admin Global
 - `/admin` — overview
@@ -84,10 +85,12 @@ Plataforma FinOps SaaS multi-tenant para AWS com atualizacao diaria e foco em vi
 
 ## Pricing
 
-| Plano | Preco | Duracao |
-|---|---|---|
-| **Trial** | Gratis | 90 dias, tudo ilimitado |
-| **Pro** | 0,5% do gasto mensal consolidado AWS | Ilimitado |
+| Plano | Preco | Duracao | Empresas |
+|---|---|---|---|
+| **Trial** | Gratis | 90 dias, tudo ilimitado | 1 empresa |
+| **Pro** | 10% da economia realizada (estimated savings) | Ilimitado | Multiplas empresas |
+
+O upgrade de Trial para Pro e feito em `/app/upgrade` com consentimento do modelo de cobranca. Ao fim de cada mes, somam-se os estimated savings dos recursos identificados e cobra-se 10% desse valor.
 
 ## Design System
 
@@ -98,8 +101,9 @@ design-system/tokens.ts  →  npm run tokens  →  globals.css (CSS vars)  →  
 ```
 
 - Tokens: cores, sidebar, radius, spacing, tipografia
-- Componentes: Button, Card, Badge, Input, Label, Dialog, Tabs
+- Componentes: Button, Card, Badge, Input, Label, Dialog, Tabs, SplitText, SubmitButton
 - Componentes de produto: PaywallGate, TrialBanner
+- Componentes de marketing: LoginModal, SignupModal, SiteHeader, SiteFooter
 - **Regra:** nunca usar hex hardcoded — sempre tokens semanticos (`bg-primary`, `text-foreground`)
 
 ## Trial e Subscription
@@ -115,6 +119,8 @@ Helpers em `lib/subscription.ts`:
 Componentes:
 - `<TrialBanner daysLeft={N} />` — banner com countdown e link de upgrade
 - `<PaywallGate hasAccess={bool}>` — bloqueia conteudo com CTA de upgrade
+- Sidebar mostra botao "Upgrade para Pro" (Trial) ou badge "Plano Pro" (Pro)
+- `<SubmitButton>` — botao com loading state via `useFormStatus` para evitar cliques duplicados
 
 ## Bootstrap (`/nimbus-setup`)
 
@@ -127,6 +133,15 @@ A rota `/nimbus-setup` e o ponto de entrada inicial da plataforma — uso unico.
 
 > **Atencao:** essa rota so funciona uma vez. Apos o setup inicial, ela retorna 404. Novos admins devem ser convidados pelo painel `/admin/admin-users`.
 
+## Multi-tenancy
+
+- Usuario pode pertencer a multiplas empresas (tenants)
+- Trial: limitado a 1 empresa. Pro: multiplas empresas
+- Tenant switcher no sidebar para alternar entre empresas
+- Pagina `/app/companies` para criar e excluir empresas (Pro)
+- Cookie `active-tenant-id` persiste a empresa ativa
+- Toda query filtra por `tenantId` (isolamento de dados)
+
 ## Modelo operacional
 
 - Nimbus Frugal roda em conta AWS propria
@@ -134,6 +149,7 @@ A rota `/nimbus-setup` e o ponto de entrada inicial da plataforma — uso unico.
 - Trust policy referencia o AWS Account ID da Nimbus com External ID unico
 - Coleta assincrona em batch a cada 24h
 - Dados nao sao real-time — freshness sempre exibido
+- Middleware Edge < 1MB (nao importa auth.ts, checa cookie direto)
 
 ## Dev
 
@@ -168,9 +184,9 @@ Ver [.env.example](./.env.example):
 nimbus-frugal/
 ├── app/                     # Next.js App Router
 │   ├── page.tsx             # Landing page
-│   ├── pricing/             # Pricing
 │   ├── signup/              # Signup self-service
 │   ├── login/               # Login (magic link + Google)
+│   ├── new-tenant/          # Criar primeiro tenant (pos-signup)
 │   ├── nimbus-setup/        # Bootstrap (uso unico)
 │   ├── app/                 # Tenant app (protegido)
 │   │   ├── dashboard/
@@ -179,23 +195,29 @@ nimbus-frugal/
 │   │   ├── organization/
 │   │   ├── recommendations/
 │   │   ├── users/
-│   │   └── settings/
+│   │   ├── settings/
+│   │   ├── companies/       # Gerenciar empresas (Pro)
+│   │   └── upgrade/         # Upgrade Trial → Pro
 │   ├── admin/               # Admin global
 │   │   ├── login/
 │   │   └── (protected)/     # Route group com requireAdmin()
 │   └── api/auth/            # Auth.js handlers
 ├── components/
-│   ├── ui/                  # shadcn/ui (Button, Card, Badge, Input, Dialog, Tabs, Label)
+│   ├── ui/                  # shadcn/ui (Button, Card, Badge, Input, Dialog, Tabs, Label, SplitText, SubmitButton)
 │   ├── paywall/             # PaywallGate, TrialBanner
 │   ├── forms/               # Form components
-│   ├── app/                 # Tenant app layout (sidebar, page-header)
+│   ├── app/                 # Tenant app layout (sidebar, tenant-switcher, logout-button, page-header)
 │   ├── admin/               # Admin layout (admin-sidebar)
-│   └── marketing/           # Site header/footer
+│   └── marketing/           # LoginModal, SignupModal, SiteHeader, SiteFooter
 ├── lib/
 │   ├── prisma.ts            # Prisma client singleton
-│   ├── utils.ts             # cn() helper
+│   ├── utils.ts             # cn(), slugify(), generateTenantSlug()
 │   ├── tenant.ts            # requireUser, requireTenant, requireAdmin
 │   ├── subscription.ts      # Trial/access helpers
+│   ├── billing-actions.ts   # Server actions: upgradeToPro, createAdditionalTenant, deleteTenant
+│   ├── auth-actions.ts      # Server actions: login/signup (Google, magic link)
+│   ├── actions.ts           # Server actions: logout
+│   ├── validations.ts       # Zod schemas
 │   └── aws-cloudformation.ts # CloudFormation template generator
 ├── design-system/
 │   ├── tokens.ts            # Source of truth (cores, spacing, tipografia)
@@ -203,7 +225,8 @@ nimbus-frugal/
 │   └── generate-css.ts      # Gera CSS vars no globals.css
 ├── stories/
 │   ├── design-tokens/       # Colors, Typography, Spacing
-│   └── components/          # Button, Card, Badge, Input, Dialog, Select, Tabs, PaywallGate, TrialBanner
+│   ├── components/          # Button, Card, Badge, Input, Dialog, Select, Tabs, PaywallGate, TrialBanner, LoginModal, SignupModal, SiteHeader, SiteFooter
+│   └── compositions/        # LandingHero, Dashboard (full-page compositions)
 ├── hooks/                   # Custom React hooks
 ├── types/                   # TypeScript types
 ├── prisma/
