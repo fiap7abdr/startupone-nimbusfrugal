@@ -60,6 +60,17 @@ Ver [.env.example](./.env.example). Configuradas:
 - `NIMBUS_PLATFORM_AWS_ACCOUNT_ID` — conta AWS da Nimbus (trust principal)
 - `VERCEL_TOKEN` — deploy
 
+## Bootstrap (`/nimbus-setup`)
+
+A rota `/nimbus-setup` é o ponto de entrada inicial da plataforma — uso único. Ela cria o primeiro **Administrador Geral** do sistema.
+
+1. Acesse `https://nimbusfrugal.cloud/nimbus-setup`
+2. Preencha nome e e-mail do administrador
+3. Um magic link será enviado para o e-mail informado
+4. Após autenticação, o admin terá acesso ao painel em `/admin`
+
+> **Atenção:** essa rota só funciona uma vez. Após o setup inicial, ela retorna 404. Novos admins devem ser convidados pelo painel `/admin/admin-users`.
+
 ## Modelo operacional
 
 - Nimbus Frugal roda em conta AWS própria
