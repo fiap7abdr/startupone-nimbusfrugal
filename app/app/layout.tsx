@@ -17,12 +17,18 @@ export default async function AppLayout({
     name: m.tenant.name,
   }));
 
+  const billing = tenant.billing;
+  const plan = billing?.plan ?? "TRIAL";
+  const trialEndsAt = billing?.trialEndsAt?.toISOString() ?? null;
+
   return (
     <div className="flex min-h-screen bg-background">
       <AppSidebar
         tenantName={tenant.name}
         tenants={tenants}
         activeTenantId={activeTenantId}
+        plan={plan}
+        trialEndsAt={trialEndsAt}
       />
       <div className="flex-1 overflow-auto">
         <main className="mx-auto max-w-6xl p-8">{children}</main>

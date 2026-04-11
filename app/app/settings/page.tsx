@@ -47,7 +47,14 @@ export default async function SettingsPage() {
               label="Plano"
               value={<Badge>{billing?.plan ?? tenant.plan}</Badge>}
             />
-            <Row label="Modelo" value="0,5% do gasto consolidado" />
+            <Row
+              label="Modelo"
+              value={
+                billing?.plan === "PRO"
+                  ? "10% da economia realizada"
+                  : "Trial gratuito"
+              }
+            />
             <Row label="Status" value={billing?.billingStatus ?? "—"} />
             <Row label="Trial expira em" value={formatDate(billing?.trialEndsAt)} />
           </CardContent>

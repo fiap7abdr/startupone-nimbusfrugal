@@ -14,6 +14,8 @@ import {
   Settings,
   Network,
   Rocket,
+  Crown,
+  Zap,
 } from "lucide-react";
 
 const NAV = [
@@ -35,12 +37,22 @@ export function AppSidebar({
   tenantName,
   tenants,
   activeTenantId,
+  plan,
+  trialEndsAt,
 }: {
   tenantName: string;
   tenants?: TenantOption[];
   activeTenantId?: string;
+  plan: string;
+  trialEndsAt: string | null;
 }) {
   const pathname = usePathname();
+  const isTrial = plan === "TRIAL";
+
+  const trialDaysLeft = trialEndsAt
+    ? Math.max(0, Math.ceil((new Date(trialEndsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    : 0;
+
   return (
     <aside className="flex h-screen w-64 flex-col bg-[#1E3A8A] text-white">
       <div className="flex h-16 items-center gap-2 border-b border-white/10 px-5">
@@ -57,6 +69,7 @@ export function AppSidebar({
             <TenantSwitcher
               tenants={tenants}
               activeTenantId={activeTenantId}
+              isTrial={isTrial}
             />
           ) : (
             <p className="truncate text-[11px] text-white/60">{tenantName}</p>
@@ -85,7 +98,28 @@ export function AppSidebar({
           );
         })}
       </nav>
-      <div className="border-t border-white/10 p-3">
+      <div className="border-t border-white/10 px-3 py-3 space-y-2">
+        {isTrial ? (
+          <Link
+            href="/app/upgrade"
+            className="flex items-center gap-3 rounded-md bg-gradient-to-r from-[#F59E0B] to-[#F97316] px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:opacity-90"
+          >
+            <Zap className="h-4 w-4" />
+            <div className="min-w-0 flex-1">
+              <span>Upgrade para Pro</span>
+              {trialDaysLeft > 0 && (
+                <p className="text-[10px] font-normal text-white/80">
+                  {trialDaysLeft} dias restantes no trial
+                </p>
+              )}
+            </div>
+          </Link>
+        ) : (
+          <div className="flex items-center gap-3 rounded-md bg-white/10 px-3 py-2 text-sm">
+            <Crown className="h-4 w-4 text-[#F59E0B]" />
+            <span className="font-medium text-white/90">Plano Pro</span>
+          </div>
+        )}
         <LogoutButton />
       </div>
     </aside>
