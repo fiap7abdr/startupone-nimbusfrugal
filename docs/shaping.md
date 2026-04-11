@@ -12,7 +12,7 @@ shaping: true
 | **R1** | **Autenticação e acesso** | Must-have |
 | R1.1 | Magic link via Resend (sem senha) + Google OAuth | Must-have |
 | R1.2 | 3 perfis: Admin Geral, Owner do Tenant, Read | Must-have |
-| R1.3 | Bootstrap one-shot para criar primeiro Admin Geral (`/nimbus-setup`) | Must-have |
+| R1.3 | Bootstrap one-shot via Google OAuth para criar primeiro Admin Geral (`/nimbus-setup`) | Must-have |
 | R1.4 | Middleware protege rotas `/app/*` e `/admin/*` (exceto `/admin/login`) | Must-have |
 | R1.5 | Signup cria apenas User (sem tenant); tenant criado em etapa separada | Must-have |
 | **R2** | **Multi-tenancy** | Must-have |
@@ -60,7 +60,7 @@ Shape A was selected and implemented in the bootstrap phase.
 
 | Part | Mechanism | Flag |
 |------|-----------|:----:|
-| **A1** | **Auth & Access** — Auth.js v5 + Resend magic link, JWT strategy, PrismaAdapter. Middleware cookie-based (não importa auth.ts para manter middleware lean). AdminUser table separada de User. | |
+| **A1** | **Auth & Access** — Auth.js v5 + Google OAuth + Resend magic link, JWT strategy, PrismaAdapter. Middleware cookie-based (não importa auth.ts para manter middleware lean). AdminUser table separada de User. Bootstrap `/nimbus-setup` usa exclusivamente Google OAuth. | |
 | **A2** | **Multi-tenancy** — Tenant model com slug único. TenantMember com targetGroup (owner/read). TenantInvitation com token e expiração. Server-side `requireTenant()` / `requireAdmin()` helpers. | |
 | **A3** | **AWS Onboarding** — Wizard 3-step em `/app/onboarding`. Server Action cria AwsOrganization + Integration (aws_organizations). `buildNimbusCloudFormationTemplate()` gera YAML com IAM Role, trust policy, External ID, permissões FinOps (ce, organizations, cost-optimization-hub, compute-optimizer, support, ssm). | |
 | **A4** | **Integrações** — CRUD de Integration com 7 connectorTypes. Health check via Server Action: valida Role ARN → ativa integração → cria IntegrationTestResult → descobre OUs/contas placeholder → upsert DataFreshnessStatus. | |
@@ -126,5 +126,3 @@ Shape A was selected and implemented in the bootstrap phase.
 - **A7 ⚠️** Lógica real de cálculo PRO (0,5% do gasto)
 - **A8 ⚠️** Cron job real para coleta diária AWS
 - Coleta real de dados AWS (atualmente só cria Integration + health check simulado)
-- Flow de accept invitation (`/invitations/:token`)
-- Conexão GitHub ↔ Vercel para auto-deploy on push

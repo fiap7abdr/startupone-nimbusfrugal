@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { signIn } from "@/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,91 +9,22 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { ShieldAlert } from "lucide-react";
-import { bootstrapSchema } from "@/lib/validations";
 
-async function createFirstAdmin(formData: FormData) {
+async function setupWithGoogle() {
   "use server";
   const state = await prisma.platformSetupState.findFirst();
   if (state?.setupCompleted) {
     redirect("/admin/login");
   }
-
-  const parsed = bootstrapSchema.safeParse({
-    name: formData.get("name"),
-    email: formData.get("email"),
-  });
-  if (!parsed.success) redirect("/nimbus-setup?error=missing");
-  const { name, email } = parsed.data;
-
-  const [admin] = await prisma.$transaction([
-    prisma.adminUser.upsert({
-      where: { email },
-      update: { name, role: "super_admin", status: "active" },
-      create: { email, name, role: "super_admin", status: "active" },
-    }),
-    prisma.user.upsert({
-      where: { email },
-      update: { name },
-      create: { email, name },
-    }),
-  ]);
-
-  await prisma.platformSetupState.upsert({
-    where: { id: state?.id ?? "bootstrap" },
-    update: {
-      setupCompleted: true,
-      initialAdminUserId: admin.id,
-      completedAt: new Date(),
-    },
-    create: {
-      id: "bootstrap",
-      setupCompleted: true,
-      setupPath: "/nimbus-setup",
-      initialAdminUserId: admin.id,
-      completedAt: new Date(),
-    },
-  });
-
-  await prisma.platformConfiguration.upsert({
-    where: { id: "default" },
-    update: {},
-    create: {
-      id: "default",
-      platformAwsAccountId:
-        process.env.NIMBUS_PLATFORM_AWS_ACCOUNT_ID ?? "123456789012",
-      externalIdStrategy: "per-integration",
-      defaultRegion: "us-east-1",
-      onboardingMode: "self-service",
-      batchIntervalHours: 24,
-    },
-  });
-
-  await prisma.auditLog.create({
-    data: {
-      entityType: "admin_user",
-      entityId: admin.id,
-      action: "platform.bootstrap",
-      actor: admin.email,
-      actorType: "admin",
-    },
-  });
-
-  redirect("/nimbus-setup/done");
+  await signIn("google", { redirectTo: "/nimbus-setup/complete" });
 }
 
-export default async function NimbusSetupPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ error?: string }>;
-}) {
+export default async function NimbusSetupPage() {
   const state = await prisma.platformSetupState.findFirst();
   if (state?.setupCompleted) {
     notFound();
   }
-  const sp = await searchParams;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#0f1b3f] p-6">
@@ -105,32 +37,37 @@ export default async function NimbusSetupPage({
             Bootstrap da plataforma Nimbus Frugal
           </CardTitle>
           <CardDescription>
-            Este formulário aparece apenas uma vez. Ele cria o primeiro
+            Este formulario aparece apenas uma vez. Ele cria o primeiro
             Administrador Geral e bloqueia permanentemente este caminho. Futuros
-            administradores gerais só entrarão por convite.
+            administradores gerais so entrarao por convite.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {sp.error && (
-            <div className="mb-4 rounded-md border border-negative/20 bg-negative/10 p-3 text-sm text-negative">
-              Preencha nome e e-mail para continuar.
-            </div>
-          )}
-          <form action={createFirstAdmin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Nome do Administrador Geral</Label>
-              <Input id="name" name="name" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">E-mail</Label>
-              <Input id="email" name="email" type="email" required />
-            </div>
-            <Button type="submit" className="w-full" size="lg">
-              Criar Administrador Geral e bloquear setup
+          <form action={setupWithGoogle} className="space-y-4">
+            <Button type="submit" variant="outline" className="w-full" size="lg">
+              <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+                <path
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
+                  fill="#4285F4"
+                />
+                <path
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  fill="#34A853"
+                />
+                <path
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                  fill="#FBBC05"
+                />
+                <path
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                  fill="#EA4335"
+                />
+              </svg>
+              Configurar com Google
             </Button>
-            <p className="text-xs text-muted-foreground">
-              Ao enviar, o setup é marcado como concluído. Você receberá um
-              magic link para acessar /admin.
+            <p className="text-center text-xs text-muted-foreground">
+              Ao continuar, sua conta Google sera registrada como Administrador
+              Geral e o setup sera bloqueado permanentemente.
             </p>
           </form>
         </CardContent>

@@ -9,11 +9,6 @@ export const createTenantSchema = z.object({
   name: z.string().trim().min(1).max(255),
 });
 
-export const bootstrapSchema = z.object({
-  name: z.string().trim().min(1).max(255),
-  email: z.string().trim().toLowerCase().email().max(255),
-});
-
 export const registerOrgSchema = z.object({
   organizationName: z.string().trim().min(1).max(255),
   organizationId: z
