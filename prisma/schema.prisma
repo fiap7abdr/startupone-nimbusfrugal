@@ -216,9 +216,10 @@ model AwsOrganization {
   discoveredAt              DateTime?
   createdAt                 DateTime  @default(now())
 
-  tenant   Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  ous      OrganizationalUnit[]
-  accounts AwsAccount[]
+  tenant       Tenant               @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  ous          OrganizationalUnit[]
+  accounts     AwsAccount[]
+  integrations Integration[]
 
   @@map("aws_organizations")
 }
@@ -261,6 +262,7 @@ model AwsAccount {
 model Integration {
   id                         String    @id @default(cuid())
   tenantId                   String
+  organizationId             String?
   connectorType              String // aws_organizations, cur, cost_explorer, cost_optimization_hub, compute_optimizer, trusted_advisor, ssm_explorer
   integrationMode            String    @default("read") // read | tagging | action
   awsAccountRefId            String?
@@ -275,9 +277,10 @@ model Integration {
   lastError                  String?
   createdAt                  DateTime  @default(now())
 
-  tenant     Tenant                  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  awsAccount AwsAccount?             @relation(fields: [awsAccountRefId], references: [id])
-  testResults IntegrationTestResult[]
+  tenant       Tenant                  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  organization AwsOrganization?        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  awsAccount   AwsAccount?             @relation(fields: [awsAccountRefId], references: [id])
+  testResults  IntegrationTestResult[]
 
   @@map("integrations")
 }

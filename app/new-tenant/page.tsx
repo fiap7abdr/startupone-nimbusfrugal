@@ -82,7 +82,7 @@ async function createTenant(formData: FormData) {
     maxAge: 60 * 60 * 24 * 365,
   });
 
-  redirect("/app/onboarding");
+  redirect("/app/integrations");
 }
 
 export default async function NewTenantPage({

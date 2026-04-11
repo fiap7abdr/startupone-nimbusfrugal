@@ -63,7 +63,7 @@ export default async function DashboardPage() {
               </p>
             </div>
             <Button asChild>
-              <Link href="/app/onboarding">Ir para onboarding</Link>
+              <Link href="/app/integrations">Adicionar AWS Organization</Link>
             </Button>
           </CardContent>
         </Card>

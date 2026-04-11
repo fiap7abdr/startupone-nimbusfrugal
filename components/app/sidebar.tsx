@@ -14,7 +14,6 @@ import {
   Users,
   Settings,
   Network,
-  Rocket,
   Crown,
   Zap,
   Menu,
@@ -23,8 +22,7 @@ import {
 
 const NAV = [
   { href: "/app/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/app/onboarding", label: "Onboarding", icon: Rocket },
-  { href: "/app/integrations", label: "Integracoes", icon: Cable },
+  { href: "/app/integrations", label: "Integracoes AWS", icon: Cable },
   { href: "/app/organization", label: "Organizacao AWS", icon: Network },
   { href: "/app/recommendations", label: "Recomendacoes", icon: Sparkles },
   { href: "/app/users", label: "Usuarios", icon: Users },

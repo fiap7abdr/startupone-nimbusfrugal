@@ -33,8 +33,7 @@ Plataforma FinOps SaaS multi-tenant para AWS com atualizacao diaria e foco em vi
 
 ### Tenant App
 - `/app/dashboard` — visao consolidada + freshness
-- `/app/onboarding` — wizard AWS Organization + CloudFormation
-- `/app/integrations` — conectores + role ARN + health check
+- `/app/integrations` — gerenciar AWS Organizations e conectores (roles, CloudFormation, health check)
 - `/app/organization` — arvore OUs/contas descoberta
 - `/app/recommendations` — oportunidades priorizadas
 - `/app/users` — membros, convites, grupos owner/read
@@ -190,7 +189,6 @@ nimbus-frugal/
 │   ├── nimbus-setup/        # Bootstrap (uso unico)
 │   ├── app/                 # Tenant app (protegido)
 │   │   ├── dashboard/
-│   │   ├── onboarding/
 │   │   ├── integrations/
 │   │   ├── organization/
 │   │   ├── recommendations/

@@ -95,6 +95,52 @@ export function getConnectorRoles(params: {
   });
 }
 
+export function buildConnectorCloudFormation(params: {
+  platformAccountId: string;
+  connectorType: string;
+  externalId: string;
+}): string {
+  const policy = CONNECTOR_POLICIES[params.connectorType];
+  if (!policy) throw new Error(`Unknown connector: ${params.connectorType}`);
+  const roleName = `NimbusFrugal${policy.roleSuffix}Role`;
+  const safeRoleName = roleName.replace(/[^a-zA-Z0-9]/g, "");
+  const actionsYaml = policy.actions.map((a) => `                  - "${a}"`).join("\n");
+
+  return `AWSTemplateFormatVersion: "2010-09-09"
+Description: "Nimbus Frugal — IAM Role for ${params.connectorType} (least privilege)"
+
+Resources:
+  ${safeRoleName}:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ${roleName}
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: "arn:aws:iam::${params.platformAccountId}:root"
+            Action: "sts:AssumeRole"
+            Condition:
+              StringEquals:
+                sts:ExternalId: "${params.externalId}"
+      Policies:
+        - PolicyName: ${roleName}Policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+${actionsYaml}
+                Resource: "*"
+
+Outputs:
+  ${safeRoleName}Arn:
+    Description: "Role ARN for ${params.connectorType}"
+    Value: !GetAtt ${safeRoleName}.Arn
+`;
+}
+
 export function buildNimbusCloudFormationTemplate(params: {
   platformAccountId: string;
   connectors: { connectorType: string; externalId: string }[];

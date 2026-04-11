@@ -97,7 +97,7 @@ export async function createAdditionalTenant(formData: FormData) {
     maxAge: 60 * 60 * 24 * 365,
   });
 
-  redirect("/app/onboarding");
+  redirect("/app/integrations");
 }
 
 export async function deleteTenant(tenantId: string) {
