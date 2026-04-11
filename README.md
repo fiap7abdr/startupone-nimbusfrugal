@@ -244,10 +244,6 @@ nimbus-frugal/
 └── auth.ts                  # Auth.js v5 config (Google + Resend)
 ```
 
-## Boilerplate
-
-Este projeto foi criado seguindo o [BOILERPLATE_MANUAL.md](./docs/BOILERPLATE_MANUAL.md), baseado no [taskflow boilerplate](https://github.com/lbrezende/taskflow/blob/main/BOILERPLATE_MANUAL.md).
-
 ## Time
 
 - Fabio Damiao Barbosa Rizzi — RM365066
