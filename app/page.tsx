@@ -1,4 +1,6 @@
+import { redirect } from "next/navigation";
 import Link from "next/link";
+import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,7 +21,10 @@ import {
   Workflow,
 } from "lucide-react";
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const session = await auth();
+  if (session?.user?.email) redirect("/app");
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <SiteHeader />
