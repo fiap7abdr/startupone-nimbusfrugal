@@ -29,7 +29,7 @@ async function inviteUser(formData: FormData) {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7);
 
-  await prisma.tenantInvitation.create({
+  const invitation = await prisma.tenantInvitation.create({
     data: {
       tenantId: tenant.id,
       email,
@@ -42,7 +42,7 @@ async function inviteUser(formData: FormData) {
     data: {
       tenantId: tenant.id,
       entityType: "tenant_invitation",
-      entityId: email,
+      entityId: invitation.id,
       action: "invitation.created",
       actor: user.email,
       actorType: "user",
@@ -156,6 +156,7 @@ export default async function UsersPage() {
                   <th className="px-4 py-2 text-left">E-mail</th>
                   <th className="px-4 py-2 text-left">Grupo</th>
                   <th className="px-4 py-2 text-left">Status</th>
+                  <th className="px-4 py-2 text-left">Link</th>
                   <th className="px-4 py-2 text-left">Expira</th>
                 </tr>
               </thead>
@@ -168,6 +169,15 @@ export default async function UsersPage() {
                     </td>
                     <td className="px-4 py-2">
                       <Badge variant="muted">{inv.status}</Badge>
+                    </td>
+                    <td className="px-4 py-2">
+                      {inv.status === "pending" ? (
+                        <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
+                          /invitations/{inv.token}
+                        </code>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
                     </td>
                     <td className="px-4 py-2 text-muted-foreground">
                       {formatDate(inv.expiresAt)}

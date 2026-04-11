@@ -1,15 +1,29 @@
 import { AppSidebar } from "@/components/app/sidebar";
 import { requireTenant } from "@/lib/tenant";
+import { cookies } from "next/headers";
 
 export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { tenant } = await requireTenant();
+  const { tenant, memberships } = await requireTenant();
+
+  const cookieStore = await cookies();
+  const activeTenantId = cookieStore.get("active-tenant-id")?.value ?? tenant.id;
+
+  const tenants = memberships.map((m) => ({
+    id: m.tenantId,
+    name: m.tenant.name,
+  }));
+
   return (
     <div className="flex min-h-screen bg-background">
-      <AppSidebar tenantName={tenant.name} />
+      <AppSidebar
+        tenantName={tenant.name}
+        tenants={tenants}
+        activeTenantId={activeTenantId}
+      />
       <div className="flex-1 overflow-auto">
         <main className="mx-auto max-w-6xl p-8">{children}</main>
       </div>

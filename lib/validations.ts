@@ -3,7 +3,10 @@ import { z } from "zod";
 export const signupSchema = z.object({
   name: z.string().trim().min(1).max(255),
   email: z.string().trim().toLowerCase().email().max(255),
-  tenant: z.string().trim().min(1).max(255),
+});
+
+export const createTenantSchema = z.object({
+  name: z.string().trim().min(1).max(255),
 });
 
 export const bootstrapSchema = z.object({

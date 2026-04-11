@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export async function requireUser() {
@@ -14,12 +15,22 @@ export async function requireUser() {
 
 export async function requireTenant() {
   const user = await requireUser();
-  const membership = await prisma.tenantMember.findFirst({
+
+  const memberships = await prisma.tenantMember.findMany({
     where: { userId: user.id, membershipStatus: "active" },
     include: { tenant: { include: { billing: true } } },
+    orderBy: { joinedAt: "desc" },
   });
-  if (!membership) redirect("/signup");
-  return { user, membership, tenant: membership.tenant };
+
+  if (memberships.length === 0) redirect("/new-tenant");
+
+  const cookieStore = await cookies();
+  const activeTenantId = cookieStore.get("active-tenant-id")?.value;
+
+  const membership =
+    memberships.find((m) => m.tenantId === activeTenantId) ?? memberships[0];
+
+  return { user, membership, tenant: membership.tenant, memberships };
 }
 
 export async function requireAdmin() {

@@ -10,15 +10,19 @@ shaping: true
 |----|-------------|--------|
 | **R0** | Plataforma FinOps SaaS multi-tenant com onboarding self-service para AWS | Core goal |
 | **R1** | **Autenticação e acesso** | Must-have |
-| R1.1 | Magic link via Resend (sem senha) | Must-have |
+| R1.1 | Magic link via Resend (sem senha) + Google OAuth | Must-have |
 | R1.2 | 3 perfis: Admin Geral, Owner do Tenant, Read | Must-have |
 | R1.3 | Bootstrap one-shot para criar primeiro Admin Geral (`/nimbus-setup`) | Must-have |
 | R1.4 | Middleware protege rotas `/app/*` e `/admin/*` (exceto `/admin/login`) | Must-have |
+| R1.5 | Signup cria apenas User (sem tenant); tenant criado em etapa separada | Must-have |
 | **R2** | **Multi-tenancy** | Must-have |
-| R2.1 | Signup cria Tenant + Owner + BillingSubscription (TRIAL 90 dias) | Must-have |
-| R2.2 | Slug único por tenant | Must-have |
-| R2.3 | Convites para membros com grupo owner/read | Must-have |
+| R2.1 | Usuario sem tenant e redirecionado para criar tenant apos login | Must-have |
+| R2.2 | Slug unico por tenant | Must-have |
+| R2.3 | Convites para membros com grupo owner/read via link com token | Must-have |
 | R2.4 | Isolamento de dados por tenant em todas as entidades | Must-have |
+| R2.5 | Usuario pode pertencer a multiplos tenants | Must-have |
+| R2.6 | Tenant switcher no sidebar com cookie `active-tenant-id` | Must-have |
+| R2.7 | Aceite de convite em `/invitations/[token]` (logado aceita direto; nao logado redireciona para login com callback) | Must-have |
 | **R3** | **Onboarding AWS** | Must-have |
 | R3.1 | Wizard registra AWS Organization (nome, ID, management account) | Must-have |
 | R3.2 | Gera template CloudFormation com IAM Role + trust policy + External ID único | Must-have |

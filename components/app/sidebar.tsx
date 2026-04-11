@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { TenantSwitcher } from "@/components/app/tenant-switcher";
 import {
   LayoutDashboard,
   Cable,
@@ -18,14 +19,27 @@ import {
 const NAV = [
   { href: "/app/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/app/onboarding", label: "Onboarding", icon: Rocket },
-  { href: "/app/integrations", label: "Integrações", icon: Cable },
-  { href: "/app/organization", label: "Organização AWS", icon: Network },
-  { href: "/app/recommendations", label: "Recomendações", icon: Sparkles },
-  { href: "/app/users", label: "Usuários", icon: Users },
+  { href: "/app/integrations", label: "Integracoes", icon: Cable },
+  { href: "/app/organization", label: "Organizacao AWS", icon: Network },
+  { href: "/app/recommendations", label: "Recomendacoes", icon: Sparkles },
+  { href: "/app/users", label: "Usuarios", icon: Users },
   { href: "/app/settings", label: "Settings", icon: Settings },
 ];
 
-export function AppSidebar({ tenantName }: { tenantName: string }) {
+interface TenantOption {
+  id: string;
+  name: string;
+}
+
+export function AppSidebar({
+  tenantName,
+  tenants,
+  activeTenantId,
+}: {
+  tenantName: string;
+  tenants?: TenantOption[];
+  activeTenantId?: string;
+}) {
   const pathname = usePathname();
   return (
     <aside className="flex h-screen w-64 flex-col bg-[#1E3A8A] text-white">
@@ -33,9 +47,16 @@ export function AppSidebar({ tenantName }: { tenantName: string }) {
         <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
           <CloudCog className="h-4 w-4" />
         </div>
-        <div>
+        <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold">Nimbus Frugal</p>
-          <p className="text-[11px] text-white/60">{tenantName}</p>
+          {tenants && activeTenantId ? (
+            <TenantSwitcher
+              tenants={tenants}
+              activeTenantId={activeTenantId}
+            />
+          ) : (
+            <p className="truncate text-[11px] text-white/60">{tenantName}</p>
+          )}
         </div>
       </div>
       <nav className="flex-1 space-y-1 px-3 py-4">
