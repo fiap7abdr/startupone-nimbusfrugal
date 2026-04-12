@@ -13,12 +13,14 @@ import { Label } from "@/components/ui/label";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
 import { createAccount, signupWithGoogle } from "@/lib/auth-actions";
+import { getTranslations } from "next-intl/server";
 
-export default function SignupPage({
+export default async function SignupPage({
   searchParams,
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
+  const t = await getTranslations("auth");
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <SiteHeader />
@@ -33,9 +35,9 @@ export default function SignupPage({
                 height={80}
                 className="mb-2"
               />
-              <CardTitle>Criar conta Nimbus Frugal</CardTitle>
+              <CardTitle>{t("signup_title")}</CardTitle>
               <CardDescription>
-                Comece o trial de 90 dias. Crie seu tenant apos o cadastro.
+                {t("signup_desc")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -47,7 +49,7 @@ export default function SignupPage({
                     <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                   </svg>
-                  Cadastrar com Google
+                  {t("signup_google")}
                 </Button>
               </form>
 
@@ -57,7 +59,7 @@ export default function SignupPage({
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
                   <span className="bg-card px-2 text-muted-foreground">
-                    ou com e-mail
+                    {t("or_email")}
                   </span>
                 </div>
               </div>
@@ -65,31 +67,31 @@ export default function SignupPage({
               <ErrorNotice searchParams={searchParams} />
               <form action={createAccount} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Seu nome</Label>
-                  <Input id="name" name="name" placeholder="Ana Souza" required />
+                  <Label htmlFor="name">{t("your_name")}</Label>
+                  <Input id="name" name="name" placeholder={t("name_placeholder")} required />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email">E-mail corporativo</Label>
+                  <Label htmlFor="email">{t("corp_email")}</Label>
                   <Input
                     id="email"
                     name="email"
                     type="email"
-                    placeholder="ana@empresa.com"
+                    placeholder={t("corp_email_placeholder")}
                     required
                   />
                 </div>
                 <Button type="submit" className="w-full">
-                  Criar conta e enviar magic link
+                  {t("signup_submit")}
                 </Button>
               </form>
 
               <p className="text-center text-xs text-muted-foreground">
-                Ja tem conta?{" "}
+                {t("has_account")}{" "}
                 <Link
                   href="/login"
                   className="font-medium text-primary hover:underline"
                 >
-                  Fazer login
+                  {t("do_login")}
                 </Link>
               </p>
             </CardContent>
@@ -108,9 +110,10 @@ async function ErrorNotice({
 }) {
   const sp = await searchParams;
   if (!sp.error) return null;
+  const t = await getTranslations("auth");
   return (
     <div className="mb-4 rounded-md border border-negative/20 bg-negative/10 p-3 text-sm text-negative">
-      Preencha todos os campos para continuar.
+      {t("fill_fields")}
     </div>
   );
 }

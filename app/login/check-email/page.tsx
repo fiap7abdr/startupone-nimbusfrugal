@@ -2,8 +2,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
 import { MailCheck } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
-export default function CheckEmailPage() {
+export default async function CheckEmailPage() {
+  const t = await getTranslations("auth");
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <SiteHeader />
@@ -14,10 +16,9 @@ export default function CheckEmailPage() {
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent text-accent-foreground">
                 <MailCheck className="h-6 w-6" />
               </div>
-              <CardTitle className="mt-4">Verifique seu e-mail</CardTitle>
+              <CardTitle className="mt-4">{t("check_email_title")}</CardTitle>
               <CardDescription>
-                Enviamos um link de acesso. Abra o e-mail e clique no link para
-                continuar.
+                {t("check_email_desc")}
               </CardDescription>
             </CardHeader>
             <CardContent />

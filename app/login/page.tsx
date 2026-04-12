@@ -13,8 +13,10 @@ import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
 import Link from "next/link";
 import { loginWithGoogle, loginWithEmail } from "@/lib/auth-actions";
+import { getTranslations } from "next-intl/server";
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const t = await getTranslations("auth");
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <SiteHeader />
@@ -29,9 +31,9 @@ export default function LoginPage() {
                 height={80}
                 className="mb-2"
               />
-              <CardTitle>Entrar na Nimbus Frugal</CardTitle>
+              <CardTitle>{t("login_title")}</CardTitle>
               <CardDescription>
-                Use sua conta Google ou receba um link de acesso por e-mail.
+                {t("login_desc")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -55,7 +57,7 @@ export default function LoginPage() {
                       fill="#EA4335"
                     />
                   </svg>
-                  Entrar com Google
+                  {t("login_google")}
                 </Button>
               </form>
 
@@ -65,7 +67,7 @@ export default function LoginPage() {
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
                   <span className="bg-card px-2 text-muted-foreground">
-                    ou com e-mail
+                    {t("or_email")}
                   </span>
                 </div>
               </div>
@@ -77,22 +79,22 @@ export default function LoginPage() {
                     id="email"
                     name="email"
                     type="email"
-                    placeholder="voce@empresa.com"
+                    placeholder={t("email_placeholder")}
                     required
                   />
                 </div>
                 <Button type="submit" className="w-full">
-                  Enviar magic link
+                  {t("send_magic_link")}
                 </Button>
               </form>
 
               <p className="text-center text-xs text-muted-foreground">
-                Nao tem conta?{" "}
+                {t("no_account")}{" "}
                 <Link
                   href="/signup"
                   className="font-medium text-primary hover:underline"
                 >
-                  Criar uma
+                  {t("create_one")}
                 </Link>
               </p>
             </CardContent>

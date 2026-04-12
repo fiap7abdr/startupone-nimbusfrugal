@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
@@ -105,6 +106,8 @@ export default async function InvitationPage({
     redirect(`/login?callbackUrl=/invitations/${token}`);
   }
 
+  const t = await getTranslations("auth");
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <SiteHeader />
@@ -115,28 +118,27 @@ export default async function InvitationPage({
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent text-accent-foreground">
                 <Users className="h-6 w-6" />
               </div>
-              <CardTitle className="mt-4">Convite para tenant</CardTitle>
+              <CardTitle className="mt-4">{t("invite_title")}</CardTitle>
               <CardDescription>
-                Voce foi convidado para{" "}
-                <strong>{invitation.tenant.name}</strong> como{" "}
+                {t("invite_text")}{" "}
+                <strong>{invitation.tenant.name}</strong> {t("invite_as")}{" "}
                 <strong>{invitation.targetGroup}</strong>.
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
               {expired ? (
                 <p className="text-sm text-negative">
-                  Este convite expirou. Solicite um novo convite ao
-                  administrador do tenant.
+                  {t("invite_expired")}
                 </p>
               ) : alreadyAccepted ? (
                 <p className="text-sm text-muted-foreground">
-                  Este convite ja foi aceito.
+                  {t("invite_used")}
                 </p>
               ) : (
                 <form action={acceptInvitation}>
                   <input type="hidden" name="token" value={token} />
                   <Button type="submit" className="w-full" size="lg">
-                    Aceitar convite
+                    {t("accept_invite")}
                   </Button>
                 </form>
               )}

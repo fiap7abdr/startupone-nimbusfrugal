@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -94,6 +95,7 @@ export default async function NewTenantPage({
   if (!session?.user?.email) redirect("/login");
 
   const sp = await searchParams;
+  const t = await getTranslations("auth");
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-6">
@@ -106,30 +108,29 @@ export default async function NewTenantPage({
             height={80}
             className="mb-2"
           />
-          <CardTitle className="mt-4">Criar seu tenant</CardTitle>
+          <CardTitle className="mt-4">{t("new_tenant_title")}</CardTitle>
           <CardDescription>
-            Um tenant representa sua organizacao na Nimbus Frugal. Voce tera 90
-            dias de trial gratuito.
+            {t("new_tenant_desc")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {sp.error && (
             <div className="mb-4 rounded-md border border-negative/20 bg-negative/10 p-3 text-sm text-negative">
-              Preencha o nome do tenant para continuar.
+              {t("fill_tenant")}
             </div>
           )}
           <form action={createTenant} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nome do tenant</Label>
+              <Label htmlFor="name">{t("tenant_name")}</Label>
               <Input
                 id="name"
                 name="name"
-                placeholder="Acme FinOps"
+                placeholder={t("tenant_placeholder")}
                 required
               />
             </div>
             <Button type="submit" className="w-full" size="lg">
-              Criar tenant e comecar
+              {t("create_tenant")}
             </Button>
           </form>
         </CardContent>
