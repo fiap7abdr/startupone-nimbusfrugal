@@ -15,7 +15,12 @@ import Link from "next/link";
 import { loginWithGoogle, loginWithEmail } from "@/lib/auth-actions";
 import { getTranslations } from "next-intl/server";
 
-export default async function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ callbackUrl?: string }>;
+}) {
+  const { callbackUrl } = await searchParams;
   const t = await getTranslations("auth");
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -38,6 +43,7 @@ export default async function LoginPage() {
             </CardHeader>
             <CardContent className="space-y-6">
               <form action={loginWithGoogle}>
+                {callbackUrl && <input type="hidden" name="redirectTo" value={callbackUrl} />}
                 <Button type="submit" variant="outline" className="w-full">
                   <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                     <path
@@ -73,6 +79,7 @@ export default async function LoginPage() {
               </div>
 
               <form action={loginWithEmail} className="space-y-4">
+                {callbackUrl && <input type="hidden" name="redirectTo" value={callbackUrl} />}
                 <div className="space-y-2">
                   <Label htmlFor="email">E-mail</Label>
                   <Input
@@ -91,7 +98,7 @@ export default async function LoginPage() {
               <p className="text-center text-xs text-muted-foreground">
                 {t("no_account")}{" "}
                 <Link
-                  href="/signup"
+                  href={callbackUrl ? `/signup?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/signup"}
                   className="font-medium text-primary hover:underline"
                 >
                   {t("create_one")}

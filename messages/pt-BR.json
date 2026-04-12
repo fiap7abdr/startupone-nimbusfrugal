@@ -21,6 +21,7 @@
     "login": "Entrar",
     "signup": "Signup",
     "send_invite": "Enviar convite",
+    "sending_invite": "Enviando...",
     "recent_invites": "Convites recentes",
     "expires": "Expira",
     "link": "Link",
@@ -110,7 +111,10 @@
     "invite_as": "como",
     "invite_expired": "Este convite expirou. Solicite um novo convite ao administrador do tenant.",
     "invite_used": "Este convite já foi aceito.",
-    "accept_invite": "Aceitar convite"
+    "accept_invite": "Aceitar convite",
+    "invite_login_prompt": "Para aceitar este convite, faça login ou crie uma conta.",
+    "invite_login": "Fazer login",
+    "invite_signup": "Criar conta"
   },
   "sidebar": {
     "dashboard": "Dashboard",

@@ -19,6 +19,7 @@ import { getTranslations } from "next-intl/server";
 import { Resend } from "resend";
 import { MembersTable } from "./members-table";
 import { InvitationsTable } from "./invitations-table";
+import { InviteSubmitButton } from "./invite-submit-button";
 
 async function inviteUser(formData: FormData) {
   "use server";
@@ -171,9 +172,7 @@ export default async function UsersPage() {
                   <option value="read">Read</option>
                 </select>
               </div>
-              <Button type="submit" className="w-full">
-                {tc("send_invite")}
-              </Button>
+              <InviteSubmitButton />
             </form>
           </CardContent>
         </Card>

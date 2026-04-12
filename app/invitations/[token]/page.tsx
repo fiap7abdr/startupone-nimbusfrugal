@@ -14,6 +14,7 @@ import {
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
 import { Users } from "lucide-react";
+import Link from "next/link";
 
 async function acceptInvitation(formData: FormData) {
   "use server";
@@ -102,11 +103,8 @@ export default async function InvitationPage({
   const session = await auth();
   const isLoggedIn = !!session?.user?.email;
 
-  if (!isLoggedIn) {
-    redirect(`/login?callbackUrl=/invitations/${token}`);
-  }
-
   const t = await getTranslations("auth");
+  const callbackUrl = `/invitations/${token}`;
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -134,6 +132,24 @@ export default async function InvitationPage({
                 <p className="text-sm text-muted-foreground">
                   {t("invite_used")}
                 </p>
+              ) : !isLoggedIn ? (
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    {t("invite_login_prompt")}
+                  </p>
+                  <div className="flex flex-col gap-2">
+                    <Button asChild className="w-full" size="lg">
+                      <Link href={`/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
+                        {t("invite_signup")}
+                      </Link>
+                    </Button>
+                    <Button asChild variant="outline" className="w-full" size="lg">
+                      <Link href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
+                        {t("invite_login")}
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
               ) : (
                 <form action={acceptInvitation}>
                   <input type="hidden" name="token" value={token} />

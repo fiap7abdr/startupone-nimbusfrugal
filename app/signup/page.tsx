@@ -18,8 +18,9 @@ import { getTranslations } from "next-intl/server";
 export default async function SignupPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; callbackUrl?: string }>;
 }) {
+  const { callbackUrl } = await searchParams;
   const t = await getTranslations("auth");
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -42,6 +43,7 @@ export default async function SignupPage({
             </CardHeader>
             <CardContent className="space-y-6">
               <form action={signupWithGoogle}>
+                {callbackUrl && <input type="hidden" name="redirectTo" value={callbackUrl} />}
                 <Button type="submit" variant="outline" className="w-full">
                   <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
@@ -66,6 +68,7 @@ export default async function SignupPage({
 
               <ErrorNotice searchParams={searchParams} />
               <form action={createAccount} className="space-y-4">
+                {callbackUrl && <input type="hidden" name="redirectTo" value={callbackUrl} />}
                 <div className="space-y-2">
                   <Label htmlFor="name">{t("your_name")}</Label>
                   <Input id="name" name="name" placeholder={t("name_placeholder")} required />
@@ -88,7 +91,7 @@ export default async function SignupPage({
               <p className="text-center text-xs text-muted-foreground">
                 {t("has_account")}{" "}
                 <Link
-                  href="/login"
+                  href={callbackUrl ? `/login?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/login"}
                   className="font-medium text-primary hover:underline"
                 >
                   {t("do_login")}

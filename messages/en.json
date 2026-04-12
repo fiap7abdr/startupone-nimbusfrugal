@@ -21,6 +21,7 @@
     "login": "Login",
     "signup": "Sign up",
     "send_invite": "Send invite",
+    "sending_invite": "Sending...",
     "recent_invites": "Recent invites",
     "expires": "Expires",
     "link": "Link",
@@ -110,7 +111,10 @@
     "invite_as": "as",
     "invite_expired": "This invitation has expired. Request a new invitation from the tenant administrator.",
     "invite_used": "This invitation has already been accepted.",
-    "accept_invite": "Accept invitation"
+    "accept_invite": "Accept invitation",
+    "invite_login_prompt": "To accept this invitation, please log in or create an account.",
+    "invite_login": "Log in",
+    "invite_signup": "Create account"
   },
   "sidebar": {
     "dashboard": "Dashboard",
