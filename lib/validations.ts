@@ -14,11 +14,11 @@ export const registerOrgSchema = z.object({
   organizationId: z
     .string()
     .trim()
-    .regex(/^o-[a-z0-9]{10,32}$/, "ID deve seguir formato o-xxxxxxxxxx"),
+    .regex(/^o-[a-z0-9]{10,32}$/, "invalid_org_id"),
   managementAccountId: z
     .string()
     .trim()
-    .regex(/^\d{12}$/, "Account ID deve ter 12 digitos"),
+    .regex(/^\d{12}$/, "invalid_account_id"),
 });
 
 export const inviteUserSchema = z.object({
@@ -35,7 +35,7 @@ export const roleArnSchema = z.object({
   roleArn: z
     .string()
     .trim()
-    .regex(/^arn:aws:iam::\d{12}:role\/.+$/, "Formato ARN invalido"),
+    .regex(/^arn:aws:iam::\d{12}:role\/.+$/, "invalid_arn"),
 });
 
 export const loginEmailSchema = z.object({

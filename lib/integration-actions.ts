@@ -7,6 +7,7 @@ import { randomExternalId } from "@/lib/utils";
 import { CONNECTOR_TYPES } from "@/lib/aws-cloudformation";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 const PAGE_PATH = "/app/integrations";
 
@@ -169,13 +170,14 @@ export async function runHealthCheck(formData: FormData) {
   });
   if (!integration) return;
 
+  const t = await getTranslations("integrations");
   const ok = !!integration.roleArn;
   await prisma.integrationTestResult.create({
     data: {
       integrationId,
       status: ok ? "ok" : "error",
       serviceChecked: "sts:AssumeRole (simulated)",
-      errorDetails: ok ? null : "Role ARN nao configurado",
+      errorDetails: ok ? null : t("health_check_no_arn"),
     },
   });
   await prisma.integration.update({
@@ -184,7 +186,7 @@ export async function runHealthCheck(formData: FormData) {
       status: ok ? "active" : "error",
       healthStatus: ok ? "healthy" : "error",
       lastSuccessfulCollection: ok ? new Date() : integration.lastSuccessfulCollection,
-      lastError: ok ? null : "Role ARN ausente",
+      lastError: ok ? null : t("health_check_arn_missing"),
     },
   });
 
