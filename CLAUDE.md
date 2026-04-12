@@ -4,7 +4,7 @@
 - Next.js 15 (App Router) + TypeScript strict
 - Tailwind CSS 4 + design system tokens (`design-system/tokens.ts`)
 - Prisma 6 + PostgreSQL (Neon)
-- Auth.js v5 (Google OAuth + Resend magic link, JWT strategy)
+- Auth.js v5 (Google OAuth only, JWT strategy)
 - Storybook 8 (react-vite)
 - shadcn/ui-style components with `class-variance-authority`
 
@@ -16,7 +16,7 @@
 - **Multi-tenant isolation:** Every query must filter by `tenantId`.
 
 ## Auth
-- Google OAuth + Resend magic link (dual provider)
+- Google OAuth only (single provider)
 - JWT session strategy with PrismaAdapter
 - `requireUser()`, `requireTenant()`, `requireAdmin()` helpers in `lib/tenant.ts`
 - Admin users stored in separate `AdminUser` table

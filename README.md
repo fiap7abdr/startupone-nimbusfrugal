@@ -14,7 +14,7 @@ Plataforma FinOps SaaS multi-tenant para AWS com atualizacao diaria e foco em vi
 | TypeScript strict | Tipagem |
 | Tailwind CSS 4 | Estilizacao via design tokens |
 | Prisma 6 + PostgreSQL (Neon) | ORM + banco |
-| Auth.js v5 | Autenticacao (Google OAuth + Resend magic link) |
+| Auth.js v5 | Autenticacao (Google OAuth) |
 | Storybook 8 (react-vite) | Documentacao de componentes |
 | TanStack Query | Data fetching client |
 | Zod | Validacao |
@@ -25,8 +25,8 @@ Plataforma FinOps SaaS multi-tenant para AWS com atualizacao diaria e foco em vi
 
 ### Publico
 - `/` — landing page (Hero com SplitText animation, Problema, Solucao, Como Funciona, Pricing, CTA)
-- `/signup` — criacao self-service de conta (tambem acessivel via modal na landing)
-- `/login` — Google OAuth ou magic link (tambem acessivel via modal na landing)
+- `/signup` — criacao de conta via Google OAuth (tambem acessivel via modal na landing)
+- `/login` — login via Google OAuth (tambem acessivel via modal na landing)
 
 ### Bootstrap
 - `/nimbus-setup` — cria o primeiro Administrador Geral (uso unico)
@@ -128,9 +128,8 @@ Componentes:
 A rota `/nimbus-setup` e o ponto de entrada inicial da plataforma — uso unico. Ela cria o primeiro **Administrador Geral** do sistema.
 
 1. Acesse `https://nimbusfrugal.cloud/nimbus-setup`
-2. Preencha nome e e-mail do administrador
-3. Um magic link sera enviado para o e-mail informado
-4. Apos autenticacao, o admin tera acesso ao painel em `/admin`
+2. Autentique-se com Google OAuth
+3. Apos autenticacao, o admin tera acesso ao painel em `/admin`
 
 > **Atencao:** essa rota so funciona uma vez. Apos o setup inicial, ela retorna 404. Novos admins devem ser convidados pelo painel `/admin/admin-users`.
 
@@ -185,8 +184,7 @@ Ver [.env.example](./.env.example):
 | `AUTH_SECRET` | `openssl rand -base64 32` |
 | `AUTH_GOOGLE_ID` | Google Cloud Console OAuth client ID |
 | `AUTH_GOOGLE_SECRET` | Google Cloud Console OAuth client secret |
-| `AUTH_RESEND_KEY` | Resend API key (magic links) |
-| `RESEND_API_KEY` | Resend API key (transactional emails) |
+| `RESEND_API_KEY` | Resend API key (transactional emails - convites) |
 | `NEXT_PUBLIC_APP_URL` | URL base da aplicacao |
 | `NIMBUS_PLATFORM_AWS_ACCOUNT_ID` | Conta AWS da Nimbus (trust principal) |
 | `VERCEL_TOKEN` | Token de deploy Vercel |
@@ -198,7 +196,7 @@ nimbus-frugal/
 ├── app/                     # Next.js App Router
 │   ├── page.tsx             # Landing page
 │   ├── signup/              # Signup self-service
-│   ├── login/               # Login (magic link + Google)
+│   ├── login/               # Login (Google OAuth)
 │   ├── new-tenant/          # Criar primeiro tenant (pos-signup)
 │   ├── nimbus-setup/        # Bootstrap (uso unico)
 │   ├── app/                 # Tenant app (protegido)
@@ -228,7 +226,7 @@ nimbus-frugal/
 │   ├── tenant.ts            # requireUser, requireTenant, requireAdmin
 │   ├── subscription.ts      # Trial/access helpers
 │   ├── billing-actions.ts   # Server actions: upgradeToPro, createAdditionalTenant, deleteTenant
-│   ├── auth-actions.ts      # Server actions: login/signup (Google, magic link)
+│   ├── auth-actions.ts      # Server actions: loginWithGoogle
 │   ├── actions.ts           # Server actions: logout
 │   ├── validations.ts       # Zod schemas
 │   ├── locale-actions.ts    # Server action: setLocale (cookie NEXT_LOCALE)

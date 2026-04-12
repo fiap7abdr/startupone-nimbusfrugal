@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { signIn } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,19 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { getTranslations } from "next-intl/server";
-
-async function adminLogin(formData: FormData) {
-  "use server";
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
-  const admin = await prisma.adminUser.findUnique({ where: { email } });
-  if (!admin || admin.status !== "active") {
-    redirect("/admin/login?error=forbidden");
-  }
-  await signIn("resend", { email, redirectTo: "/admin" });
-}
 
 async function adminLoginWithGoogle() {
   "use server";
@@ -37,7 +24,6 @@ export default async function AdminLoginPage({
   const state = await prisma.platformSetupState.findFirst();
   const sp = await searchParams;
   const t = await getTranslations("admin");
-  const tc = await getTranslations("common");
   const tauth = await getTranslations("auth");
 
   return (
@@ -78,25 +64,6 @@ export default async function AdminLoginPage({
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
               </svg>
               {tauth("login_google")}
-            </Button>
-          </form>
-
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">{tc("or")}</span>
-            </div>
-          </div>
-
-          <form action={adminLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">{tc("email")}</Label>
-              <Input id="email" name="email" type="email" required />
-            </div>
-            <Button type="submit" className="w-full">
-              {tauth("send_magic_link")}
             </Button>
           </form>
         </CardContent>

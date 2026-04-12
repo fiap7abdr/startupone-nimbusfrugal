@@ -7,12 +7,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
-import Link from "next/link";
-import { loginWithGoogle, loginWithEmail } from "@/lib/auth-actions";
+import { loginWithGoogle } from "@/lib/auth-actions";
 import { getTranslations } from "next-intl/server";
 
 export default async function LoginPage({
@@ -41,7 +38,7 @@ export default async function LoginPage({
                 {t("login_desc")}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent>
               <form action={loginWithGoogle}>
                 {callbackUrl && <input type="hidden" name="redirectTo" value={callbackUrl} />}
                 <Button type="submit" variant="outline" className="w-full">
@@ -66,44 +63,6 @@ export default async function LoginPage({
                   {t("login_google")}
                 </Button>
               </form>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-border" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">
-                    {t("or_email")}
-                  </span>
-                </div>
-              </div>
-
-              <form action={loginWithEmail} className="space-y-4">
-                {callbackUrl && <input type="hidden" name="redirectTo" value={callbackUrl} />}
-                <div className="space-y-2">
-                  <Label htmlFor="email">E-mail</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder={t("email_placeholder")}
-                    required
-                  />
-                </div>
-                <Button type="submit" className="w-full">
-                  {t("send_magic_link")}
-                </Button>
-              </form>
-
-              <p className="text-center text-xs text-muted-foreground">
-                {t("no_account")}{" "}
-                <Link
-                  href={callbackUrl ? `/signup?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/signup"}
-                  className="font-medium text-primary hover:underline"
-                >
-                  {t("create_one")}
-                </Link>
-              </p>
             </CardContent>
           </Card>
         </section>
