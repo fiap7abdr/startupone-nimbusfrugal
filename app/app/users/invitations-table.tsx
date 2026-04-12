@@ -14,7 +14,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Loader2, RotateCcw, Check, Trash2 } from "lucide-react";
-import { resendInvite, revokeInvite } from "@/lib/member-actions";
+import { resendInvite, deleteInvite } from "@/lib/member-actions";
 
 const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
 
@@ -42,7 +42,7 @@ export function InvitationsTable({
   const tc = useTranslations("common");
   const router = useRouter();
   const [resendingId, setResendingId] = useState<string | null>(null);
-  const [revokingId, setRevokingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [, setTick] = useState(0);
 
   // Re-render every 30s to update cooldown state
@@ -63,9 +63,9 @@ export function InvitationsTable({
     }
   }
 
-  async function handleRevoke(invitationId: string) {
-    await revokeInvite(invitationId);
-    setRevokingId(null);
+  async function handleDelete(invitationId: string) {
+    await deleteInvite(invitationId);
+    setDeletingId(null);
     router.refresh();
   }
 
@@ -102,11 +102,7 @@ export function InvitationsTable({
     );
   }
 
-  function canRevoke(inv: Invitation) {
-    return inv.status === "pending" && !inv.isRegistered;
-  }
-
-  const invToRevoke = invitations.find((inv) => inv.id === revokingId);
+  const invToDelete = invitations.find((inv) => inv.id === deletingId);
 
   return (
     <>
@@ -169,16 +165,14 @@ export function InvitationsTable({
                         )}
                       </Button>
                     )}
-                    {canRevoke(inv) && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                        onClick={() => setRevokingId(inv.id)}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      onClick={() => setDeletingId(inv.id)}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
                   </div>
                 </td>
               </tr>
@@ -188,18 +182,18 @@ export function InvitationsTable({
       </table>
 
       <Dialog
-        open={revokingId !== null}
+        open={deletingId !== null}
         onOpenChange={(open) => {
-          if (!open) setRevokingId(null);
+          if (!open) setDeletingId(null);
         }}
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("revoke_invite")}</DialogTitle>
+            <DialogTitle>{t("delete_invite")}</DialogTitle>
             <DialogDescription>
-              {t("revoke_confirm")}{" "}
-              <strong>{invToRevoke?.email}</strong>
-              {t("revoke_confirm_suffix")}
+              {t("delete_confirm")}{" "}
+              <strong>{invToDelete?.email}</strong>
+              {t("delete_confirm_suffix")}
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2">
@@ -208,9 +202,9 @@ export function InvitationsTable({
             </DialogClose>
             <Button
               variant="destructive"
-              onClick={() => revokingId && handleRevoke(revokingId)}
+              onClick={() => deletingId && handleDelete(deletingId)}
             >
-              {t("revoke_invite")}
+              {t("delete_invite")}
             </Button>
           </div>
         </DialogContent>

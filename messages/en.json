@@ -240,9 +240,9 @@
     "status_expired": "Expired",
     "status_registered": "Registered",
     "status_revoked": "Revoked",
-    "revoke_invite": "Revoke",
-    "revoke_confirm": "Are you sure you want to revoke the invite for",
-    "revoke_confirm_suffix": "? The invite link will be invalidated."
+    "delete_invite": "Delete",
+    "delete_confirm": "Are you sure you want to delete the invite for",
+    "delete_confirm_suffix": "? If the user has already registered, they will be removed from the tenant."
   },
   "settings": {
     "title": "Settings",

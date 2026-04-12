@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { getTranslations } from "next-intl/server";
-import { auth } from "@/auth";
+import { auth, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,15 +16,7 @@ import { SiteFooter } from "@/components/marketing/site-footer";
 import { Users } from "lucide-react";
 import Link from "next/link";
 
-async function acceptInvitation(formData: FormData) {
-  "use server";
-
-  const token = String(formData.get("token") ?? "");
-  const session = await auth();
-  if (!session?.user?.email) {
-    redirect(`/login?callbackUrl=/invitations/${token}`);
-  }
-
+async function acceptInvitation(token: string, userEmail: string) {
   const invitation = await prisma.tenantInvitation.findUnique({
     where: { token },
     include: { tenant: true },
@@ -37,7 +29,7 @@ async function acceptInvitation(formData: FormData) {
   }
 
   const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
+    where: { email: userEmail },
   });
   if (!user) redirect("/login");
 
@@ -79,16 +71,17 @@ async function acceptInvitation(formData: FormData) {
     sameSite: "lax",
     maxAge: 60 * 60 * 24 * 365,
   });
-
-  redirect("/app/dashboard");
 }
 
 export default async function InvitationPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ token: string }>;
+  searchParams: Promise<{ flow?: string }>;
 }) {
   const { token } = await params;
+  const { flow } = await searchParams;
 
   const invitation = await prisma.tenantInvitation.findUnique({
     where: { token },
@@ -103,8 +96,20 @@ export default async function InvitationPage({
   const session = await auth();
   const isLoggedIn = !!session?.user?.email;
 
+  // Logged in + flow=accept → user just came back from signup/login, auto-accept
+  if (isLoggedIn && flow === "accept" && !expired && !alreadyAccepted) {
+    await acceptInvitation(token, session.user!.email!);
+    redirect("/app/dashboard");
+  }
+
+  // Logged in without flow=accept → sign out and redirect back (force signup flow)
+  if (isLoggedIn && !expired && !alreadyAccepted) {
+    await signOut({ redirect: false });
+    redirect(`/invitations/${token}`);
+  }
+
   const t = await getTranslations("auth");
-  const callbackUrl = `/invitations/${token}`;
+  const callbackUrl = `/invitations/${token}?flow=accept`;
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -132,7 +137,7 @@ export default async function InvitationPage({
                 <p className="text-sm text-muted-foreground">
                   {t("invite_used")}
                 </p>
-              ) : !isLoggedIn ? (
+              ) : (
                 <div className="space-y-3">
                   <p className="text-sm text-muted-foreground">
                     {t("invite_login_prompt")}
@@ -150,13 +155,6 @@ export default async function InvitationPage({
                     </Button>
                   </div>
                 </div>
-              ) : (
-                <form action={acceptInvitation}>
-                  <input type="hidden" name="token" value={token} />
-                  <Button type="submit" className="w-full" size="lg">
-                    {t("accept_invite")}
-                  </Button>
-                </form>
               )}
             </CardContent>
           </Card>

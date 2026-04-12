@@ -240,9 +240,9 @@
     "status_expired": "Expirado",
     "status_registered": "Cadastrado",
     "status_revoked": "Revogado",
-    "revoke_invite": "Revogar",
-    "revoke_confirm": "Tem certeza que deseja revogar o convite de",
-    "revoke_confirm_suffix": "? O link de convite será invalidado."
+    "delete_invite": "Excluir",
+    "delete_confirm": "Tem certeza que deseja excluir o convite de",
+    "delete_confirm_suffix": "? Se o usuário já tiver sido cadastrado, será removido do tenant."
   },
   "settings": {
     "title": "Configurações",

@@ -149,7 +149,7 @@ export async function resendInvite(invitationId: string) {
   revalidatePath("/app/users");
 }
 
-export async function revokeInvite(invitationId: string) {
+export async function deleteInvite(invitationId: string) {
   const { user, tenant } = await requireTenant();
 
   const invitation = await prisma.tenantInvitation.findUnique({
@@ -160,13 +160,19 @@ export async function revokeInvite(invitationId: string) {
     throw new Error("Invitation not found.");
   }
 
-  if (invitation.status !== "pending") {
-    throw new Error("Invitation is not pending.");
+  // If user already registered via this invite, remove from tenant
+  const invitedUser = await prisma.user.findUnique({
+    where: { email: invitation.email },
+  });
+
+  if (invitedUser) {
+    await prisma.tenantMember.deleteMany({
+      where: { tenantId: tenant.id, userId: invitedUser.id },
+    });
   }
 
-  await prisma.tenantInvitation.update({
+  await prisma.tenantInvitation.delete({
     where: { id: invitationId },
-    data: { status: "revoked" },
   });
 
   await prisma.auditLog.create({
@@ -174,7 +180,7 @@ export async function revokeInvite(invitationId: string) {
       tenantId: tenant.id,
       entityType: "tenant_invitation",
       entityId: invitationId,
-      action: "invitation.revoked",
+      action: "invitation.deleted",
       actor: user.email,
       actorType: "user",
     },
