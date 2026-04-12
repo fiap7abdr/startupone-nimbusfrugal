@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { PageHeader } from "@/components/app/page-header";
 import { CompaniesClient } from "./companies-client";
+import { getTranslations } from "next-intl/server";
 
 export default async function CompaniesPage() {
   const { user, tenant, memberships } = await requireTenant();
@@ -10,6 +11,8 @@ export default async function CompaniesPage() {
   if (tenant.billing?.plan !== "PRO") {
     redirect("/app/upgrade");
   }
+
+  const t = await getTranslations("companies");
 
   const companies = await Promise.all(
     memberships.map(async (m) => {
@@ -32,8 +35,8 @@ export default async function CompaniesPage() {
   return (
     <div>
       <PageHeader
-        title="Empresas"
-        description="Gerencie as empresas que voce participa."
+        title={t("title")}
+        description={t("description")}
       />
       <CompaniesClient
         companies={companies}

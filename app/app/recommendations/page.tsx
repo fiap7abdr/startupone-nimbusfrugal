@@ -9,9 +9,14 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 import { requireTenant } from "@/lib/tenant";
+import { getTranslations } from "next-intl/server";
 
 export default async function RecommendationsPage() {
   const { tenant } = await requireTenant();
+  const [t, tc] = await Promise.all([
+    getTranslations("recommendations"),
+    getTranslations("common"),
+  ]);
   const recs = await prisma.recommendation.findMany({
     where: { tenantId: tenant.id },
     orderBy: [{ priority: "desc" }, { createdAt: "desc" }],
@@ -21,16 +26,15 @@ export default async function RecommendationsPage() {
   return (
     <div>
       <PageHeader
-        title="Recomendações"
-        description="Oportunidades priorizadas de Cost Optimization Hub, Compute Optimizer e Trusted Advisor."
+        title={t("title")}
+        description={t("description")}
       />
       {recs.length === 0 ? (
         <Card>
           <CardHeader>
-            <CardTitle>Nenhuma recomendação ainda</CardTitle>
+            <CardTitle>{t("empty_title")}</CardTitle>
             <CardDescription>
-              As recomendações aparecem após o primeiro batch diário. Complete o
-              onboarding e aguarde a próxima janela de coleta.
+              {t("empty_desc")}
             </CardDescription>
           </CardHeader>
         </Card>
@@ -40,12 +44,12 @@ export default async function RecommendationsPage() {
             <table className="w-full text-sm">
               <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
                 <tr>
-                  <th className="px-4 py-3 text-left">Tipo</th>
-                  <th className="px-4 py-3 text-left">Fonte</th>
-                  <th className="px-4 py-3 text-left">Conta</th>
-                  <th className="px-4 py-3 text-left">Prioridade</th>
-                  <th className="px-4 py-3 text-right">Savings (mês)</th>
-                  <th className="px-4 py-3 text-left">Status</th>
+                  <th className="px-4 py-3 text-left">{t("col_type")}</th>
+                  <th className="px-4 py-3 text-left">{t("col_source")}</th>
+                  <th className="px-4 py-3 text-left">{t("col_account")}</th>
+                  <th className="px-4 py-3 text-left">{t("col_priority")}</th>
+                  <th className="px-4 py-3 text-right">{t("col_savings")}</th>
+                  <th className="px-4 py-3 text-left">{tc("status")}</th>
                 </tr>
               </thead>
               <tbody>

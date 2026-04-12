@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { upgradeToPro } from "@/lib/billing-actions";
 import { SubmitButton } from "@/components/ui/submit-button";
 import {
@@ -13,6 +14,7 @@ import {
 import { Check, Crown, Building2, BarChart3, Shield } from "lucide-react";
 
 export function UpgradeForm({ daysLeft }: { daysLeft: number }) {
+  const t = useTranslations("upgrade");
   const [agreed, setAgreed] = useState(false);
 
   return (
@@ -20,8 +22,8 @@ export function UpgradeForm({ daysLeft }: { daysLeft: number }) {
       {/* Current plan info */}
       {daysLeft > 0 && (
         <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
-          Voce tem <strong>{daysLeft} dias</strong> restantes no trial.
-          Ao fazer upgrade, seu plano muda imediatamente para Pro.
+          {t("trial_remaining")} <strong>{daysLeft} {t("trial_days")}</strong>{" "}
+          {t("trial_suffix")}
         </div>
       )}
 
@@ -33,10 +35,10 @@ export function UpgradeForm({ daysLeft }: { daysLeft: number }) {
               <Crown className="h-5 w-5 text-white" />
             </div>
             <div>
-              <CardTitle>Plano Pro</CardTitle>
+              <CardTitle>{t("pro_plan")}</CardTitle>
               <CardDescription>
                 <span className="text-2xl font-bold text-foreground">10%</span>{" "}
-                da economia realizada
+                {t("pro_price")}
               </CardDescription>
             </div>
           </div>
@@ -45,40 +47,26 @@ export function UpgradeForm({ daysLeft }: { daysLeft: number }) {
           {/* Benefits */}
           <div className="space-y-3">
             <p className="text-sm font-medium text-muted-foreground">
-              O que voce desbloqueia:
+              {t("benefits_title")}
             </p>
             <ul className="space-y-2.5">
-              <Benefit
-                icon={Building2}
-                text="Multiplas empresas — crie e alterne entre varias organizacoes"
-              />
-              <Benefit
-                icon={BarChart3}
-                text="Batches diarios consolidados e reprocessamento"
-              />
-              <Benefit
-                icon={Shield}
-                text="Workflow de acoes com owner, prioridade e auditoria"
-              />
-              <Benefit
-                icon={Check}
-                text="Excecoes com justificativa, aprovacao e expiracao"
-              />
-              <Benefit
-                icon={Check}
-                text="Sem limite de tempo — tudo do Trial, permanente"
-              />
+              <Benefit icon={Building2} text={t("benefit1")} />
+              <Benefit icon={BarChart3} text={t("benefit2")} />
+              <Benefit icon={Shield} text={t("benefit3")} />
+              <Benefit icon={Check} text={t("benefit4")} />
+              <Benefit icon={Check} text={t("benefit5")} />
             </ul>
           </div>
 
           {/* Billing model explanation */}
           <div className="rounded-lg bg-muted/50 p-4 space-y-2">
-            <p className="text-sm font-semibold">Como funciona a cobranca</p>
+            <p className="text-sm font-semibold">{t("billing_title")}</p>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Ao fim de cada mes, somamos os <strong>estimated savings</strong> dos
-              recursos identificados com potencial de economia na sua conta AWS.
-              Cobramos <strong>10% desse valor</strong>. Voce so paga quando
-              economiza.
+              {t("billing_desc1")}{" "}
+              <strong>{t("billing_estimated")}</strong>{" "}
+              {t("billing_desc2")}{" "}
+              <strong>{t("billing_percent")}</strong>.{" "}
+              {t("billing_desc3")}
             </p>
           </div>
 
@@ -91,9 +79,7 @@ export function UpgradeForm({ daysLeft }: { daysLeft: number }) {
               className="mt-0.5 h-4 w-4 rounded border-gray-300 text-primary accent-primary"
             />
             <span className="text-sm leading-relaxed">
-              Li e concordo com o modelo de cobranca do plano Pro.
-              Entendo que serei cobrado mensalmente em 10% dos estimated savings
-              identificados nos meus recursos AWS.
+              {t("consent")}
             </span>
           </label>
 
@@ -103,10 +89,10 @@ export function UpgradeForm({ daysLeft }: { daysLeft: number }) {
               disabled={!agreed}
               className="w-full bg-gradient-to-r from-[#F59E0B] to-[#F97316] text-white hover:opacity-90 disabled:opacity-50"
               size="lg"
-              pendingText="Processando..."
+              pendingText={t("processing")}
             >
               <Crown className="mr-2 h-4 w-4" />
-              Confirmar upgrade para Pro
+              {t("confirm_upgrade")}
             </SubmitButton>
           </form>
         </CardContent>

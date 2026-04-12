@@ -10,9 +10,14 @@ import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 import { requireTenant } from "@/lib/tenant";
 import { formatDate } from "@/lib/utils";
+import { getTranslations } from "next-intl/server";
 
 export default async function SettingsPage() {
   const { tenant } = await requireTenant();
+  const [t, tc] = await Promise.all([
+    getTranslations("settings"),
+    getTranslations("common"),
+  ]);
   const billing = await prisma.billingSubscription.findUnique({
     where: { tenantId: tenant.id },
   });
@@ -20,43 +25,43 @@ export default async function SettingsPage() {
   return (
     <div>
       <PageHeader
-        title="Settings"
-        description="Configurações do tenant e billing."
+        title={t("title")}
+        description={t("description")}
       />
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Tenant</CardTitle>
-            <CardDescription>Identificação e status do tenant.</CardDescription>
+            <CardTitle>{t("tenant_title")}</CardTitle>
+            <CardDescription>{t("tenant_desc")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
-            <Row label="Nome" value={tenant.name} />
-            <Row label="Slug" value={<span className="font-mono">{tenant.slug}</span>} />
-            <Row label="Status" value={tenant.status} />
-            <Row label="Criado em" value={formatDate(tenant.createdAt)} />
+            <Row label={tc("name")} value={tenant.name} />
+            <Row label={t("slug")} value={<span className="font-mono">{tenant.slug}</span>} />
+            <Row label={tc("status")} value={tenant.status} />
+            <Row label={t("created_at")} value={formatDate(tenant.createdAt)} />
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Billing</CardTitle>
-            <CardDescription>Plano e modelo de cobrança.</CardDescription>
+            <CardTitle>{t("billing_title")}</CardTitle>
+            <CardDescription>{t("billing_desc")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <Row
-              label="Plano"
+              label={tc("plan")}
               value={<Badge>{billing?.plan ?? tenant.plan}</Badge>}
             />
             <Row
-              label="Modelo"
+              label={tc("model")}
               value={
                 billing?.plan === "PRO"
-                  ? "10% da economia realizada"
-                  : "Trial gratuito"
+                  ? t("billing_model")
+                  : t("trial_free")
               }
             />
-            <Row label="Status" value={billing?.billingStatus ?? "—"} />
-            <Row label="Trial expira em" value={formatDate(billing?.trialEndsAt)} />
+            <Row label={tc("status")} value={billing?.billingStatus ?? "—"} />
+            <Row label={t("trial_expires")} value={formatDate(billing?.trialEndsAt)} />
           </CardContent>
         </Card>
       </div>

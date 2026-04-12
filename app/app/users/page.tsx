@@ -15,6 +15,7 @@ import { requireTenant } from "@/lib/tenant";
 import { formatDate } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
 import { inviteUserSchema } from "@/lib/validations";
+import { getTranslations } from "next-intl/server";
 
 async function inviteUser(formData: FormData) {
   "use server";
@@ -53,6 +54,10 @@ async function inviteUser(formData: FormData) {
 
 export default async function UsersPage() {
   const { tenant } = await requireTenant();
+  const [t, tc] = await Promise.all([
+    getTranslations("users"),
+    getTranslations("common"),
+  ]);
   const [members, invitations] = await Promise.all([
     prisma.tenantMember.findMany({
       where: { tenantId: tenant.id },
@@ -68,23 +73,23 @@ export default async function UsersPage() {
   return (
     <div>
       <PageHeader
-        title="Usuários"
-        description="Gerencie membros do tenant e convites. Grupos padrão: owner e read."
+        title={t("title")}
+        description={t("description")}
       />
 
       <div className="grid gap-6 md:grid-cols-[2fr_1fr]">
         <Card>
           <CardHeader>
-            <CardTitle>Membros ({members.length})</CardTitle>
+            <CardTitle>{t("members")} ({members.length})</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <table className="w-full text-sm">
               <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
                 <tr>
-                  <th className="px-4 py-2 text-left">Usuário</th>
-                  <th className="px-4 py-2 text-left">Grupo</th>
-                  <th className="px-4 py-2 text-left">Status</th>
-                  <th className="px-4 py-2 text-left">Entrou em</th>
+                  <th className="px-4 py-2 text-left">{t("col_user")}</th>
+                  <th className="px-4 py-2 text-left">{t("col_group")}</th>
+                  <th className="px-4 py-2 text-left">{tc("status")}</th>
+                  <th className="px-4 py-2 text-left">{t("col_joined")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -112,20 +117,19 @@ export default async function UsersPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Convidar usuário</CardTitle>
+            <CardTitle>{t("invite_title")}</CardTitle>
             <CardDescription>
-              O convite expira em 7 dias. Owners têm acesso total; Read apenas
-              visualização.
+              {t("invite_desc")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form action={inviteUser} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">E-mail</Label>
+                <Label htmlFor="email">{tc("email")}</Label>
                 <Input id="email" name="email" type="email" required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="group">Grupo</Label>
+                <Label htmlFor="group">{t("col_group")}</Label>
                 <select
                   id="group"
                   name="group"
@@ -137,7 +141,7 @@ export default async function UsersPage() {
                 </select>
               </div>
               <Button type="submit" className="w-full">
-                Enviar convite
+                {tc("send_invite")}
               </Button>
             </form>
           </CardContent>
@@ -147,17 +151,17 @@ export default async function UsersPage() {
       {invitations.length > 0 && (
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>Convites recentes</CardTitle>
+            <CardTitle>{tc("recent_invites")}</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <table className="w-full text-sm">
               <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
                 <tr>
-                  <th className="px-4 py-2 text-left">E-mail</th>
-                  <th className="px-4 py-2 text-left">Grupo</th>
-                  <th className="px-4 py-2 text-left">Status</th>
-                  <th className="px-4 py-2 text-left">Link</th>
-                  <th className="px-4 py-2 text-left">Expira</th>
+                  <th className="px-4 py-2 text-left">{tc("email")}</th>
+                  <th className="px-4 py-2 text-left">{t("col_group")}</th>
+                  <th className="px-4 py-2 text-left">{tc("status")}</th>
+                  <th className="px-4 py-2 text-left">{tc("link")}</th>
+                  <th className="px-4 py-2 text-left">{tc("expires")}</th>
                 </tr>
               </thead>
               <tbody>

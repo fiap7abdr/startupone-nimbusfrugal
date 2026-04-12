@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/app/page-header";
 import { UpgradeForm } from "./upgrade-form";
 import { daysLeftInTrial } from "@/lib/subscription";
+import { getTranslations } from "next-intl/server";
 
 export default async function UpgradePage() {
   const { tenant } = await requireTenant();
@@ -11,13 +12,14 @@ export default async function UpgradePage() {
     redirect("/app/settings");
   }
 
+  const t = await getTranslations("upgrade");
   const daysLeft = daysLeftInTrial(tenant.billing);
 
   return (
     <div className="mx-auto max-w-2xl">
       <PageHeader
-        title="Upgrade para Pro"
-        description="Desbloqueie recursos avancados e multiplas empresas."
+        title={t("title")}
+        description={t("description")}
       />
       <UpgradeForm daysLeft={daysLeft} />
     </div>

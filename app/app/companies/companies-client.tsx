@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Input } from "@/components/ui/input";
@@ -51,6 +52,8 @@ export function CompaniesClient({
   companies: Company[];
   activeTenantId: string;
 }) {
+  const t = useTranslations("companies");
+  const tc = useTranslations("common");
   const router = useRouter();
   const [switchingId, setSwitchingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -90,13 +93,13 @@ export function CompaniesClient({
                       <p className="font-semibold">{c.name}</p>
                       {isActive && (
                         <Badge variant="secondary" className="text-[10px]">
-                          Ativa
+                          {tc("active")}
                         </Badge>
                       )}
                       {c.role === "owner" && (
                         <Badge variant="outline" className="text-[10px]">
                           <Crown className="mr-1 h-2.5 w-2.5" />
-                          Owner
+                          {t("owner")}
                         </Badge>
                       )}
                     </div>
@@ -104,7 +107,10 @@ export function CompaniesClient({
                       <span className="font-mono">{c.slug}</span>
                       <span className="flex items-center gap-1">
                         <Users className="h-3 w-3" />
-                        {c.memberCount} {c.memberCount === 1 ? "membro" : "membros"}
+                        {c.memberCount}{" "}
+                        {c.memberCount === 1
+                          ? t("member_singular")
+                          : t("member_plural")}
                       </span>
                     </div>
                   </div>
@@ -123,7 +129,7 @@ export function CompaniesClient({
                       ) : (
                         <ArrowRightLeft className="mr-1.5 h-3.5 w-3.5" />
                       )}
-                      {isSwitching ? "Alternando..." : "Alternar"}
+                      {isSwitching ? t("switching") : t("switch_btn")}
                     </Button>
                   )}
                   {c.isOwner && companies.length > 1 && (
@@ -148,19 +154,19 @@ export function CompaniesClient({
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
-                          <DialogTitle>Excluir empresa</DialogTitle>
+                          <DialogTitle>{t("delete_title")}</DialogTitle>
                           <DialogDescription>
-                            Esta acao e irreversivel. Todos os dados da empresa{" "}
-                            <strong>{companyToDelete?.name}</strong> serao
-                            permanentemente excluidos, incluindo integracoes,
-                            recomendacoes e membros.
+                            {t("delete_warning")}{" "}
+                            <strong>{companyToDelete?.name}</strong>{" "}
+                            {t("delete_warning_suffix")}
                           </DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4">
                           <div className="space-y-2">
                             <Label>
-                              Digite <strong>{companyToDelete?.name}</strong> para
-                              confirmar
+                              {t("delete_type")}{" "}
+                              <strong>{companyToDelete?.name}</strong>{" "}
+                              {t("delete_confirm_suffix")}
                             </Label>
                             <Input
                               value={confirmName}
@@ -170,7 +176,7 @@ export function CompaniesClient({
                           </div>
                           <div className="flex justify-end gap-2">
                             <DialogClose asChild>
-                              <Button variant="outline">Cancelar</Button>
+                              <Button variant="outline">{tc("cancel")}</Button>
                             </DialogClose>
                             <form
                               action={async () => {
@@ -182,9 +188,9 @@ export function CompaniesClient({
                               <SubmitButton
                                 variant="destructive"
                                 disabled={confirmName !== companyToDelete?.name}
-                                pendingText="Excluindo..."
+                                pendingText={t("deleting")}
                               >
-                                Excluir empresa
+                                {t("delete_title")}
                               </SubmitButton>
                             </form>
                           </div>
@@ -204,13 +210,13 @@ export function CompaniesClient({
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <Plus className="h-4 w-4" />
-            Nova empresa
+            {t("new_company")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <form action={createAdditionalTenant} className="flex items-end gap-3">
             <div className="flex-1 space-y-2">
-              <Label htmlFor="name">Nome da empresa</Label>
+              <Label htmlFor="name">{t("company_name")}</Label>
               <Input
                 id="name"
                 name="name"
@@ -218,9 +224,9 @@ export function CompaniesClient({
                 required
               />
             </div>
-            <SubmitButton pendingText="Criando...">
+            <SubmitButton pendingText={t("creating")}>
               <Building2 className="mr-2 h-4 w-4" />
-              Criar
+              {tc("create")}
             </SubmitButton>
           </form>
         </CardContent>
