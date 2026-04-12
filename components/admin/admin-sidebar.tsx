@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { LogoutButton } from "@/components/app/logout-button";
+import { LocaleSwitcher } from "@/components/locale-switcher";
 import {
   LayoutDashboard,
   Building2,
@@ -13,16 +15,18 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-const NAV = [
-  { href: "/admin", label: "Overview", icon: LayoutDashboard },
-  { href: "/admin/tenants", label: "Tenants", icon: Building2 },
-  { href: "/admin/integrations", label: "Integrações", icon: Cable },
-  { href: "/admin/batches", label: "Batches", icon: Database },
-  { href: "/admin/admin-users", label: "Admin Users", icon: Users },
-];
-
 export function AdminSidebar({ adminEmail }: { adminEmail: string }) {
   const pathname = usePathname();
+  const t = useTranslations("admin");
+
+  const NAV = [
+    { href: "/admin", label: t("nav_overview"), icon: LayoutDashboard },
+    { href: "/admin/tenants", label: t("nav_tenants"), icon: Building2 },
+    { href: "/admin/integrations", label: t("nav_integrations"), icon: Cable },
+    { href: "/admin/batches", label: t("nav_batches"), icon: Database },
+    { href: "/admin/admin-users", label: t("nav_admins"), icon: Users },
+  ];
+
   return (
     <aside className="flex h-screen w-64 flex-col bg-[#0f1b3f] text-white">
       <div className="flex h-16 items-center gap-2 border-b border-white/10 px-5">
@@ -58,7 +62,8 @@ export function AdminSidebar({ adminEmail }: { adminEmail: string }) {
           );
         })}
       </nav>
-      <div className="border-t border-white/10 p-3">
+      <div className="border-t border-white/10 p-3 space-y-2">
+        <LocaleSwitcher className="text-white/60 hover:text-white px-1" />
         <LogoutButton />
       </div>
     </aside>

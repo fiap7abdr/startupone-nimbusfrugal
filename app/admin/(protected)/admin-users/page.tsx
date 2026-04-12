@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/tenant";
 import { formatDate } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 
 async function inviteAdmin(formData: FormData) {
   "use server";
@@ -36,26 +37,30 @@ export default async function AdminUsersPage() {
     prisma.adminUser.findMany({ orderBy: { createdAt: "asc" } }),
     prisma.adminInvitation.findMany({ orderBy: { createdAt: "desc" } }),
   ]);
+
+  const t = await getTranslations("admin");
+  const tc = await getTranslations("common");
+
   return (
     <div>
       <PageHeader
-        title="Administradores Gerais"
-        description="Apenas administradores gerais podem convidar outros administradores. Toda ação é auditada."
+        title={t("admins_title")}
+        description={t("admins_desc")}
       />
       <div className="grid gap-6 md:grid-cols-[2fr_1fr]">
         <Card>
           <CardHeader>
-            <CardTitle>Administradores ({admins.length})</CardTitle>
+            <CardTitle>{t("admins_list")} ({admins.length})</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <table className="w-full text-sm">
               <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
                 <tr>
-                  <th className="px-4 py-2 text-left">Nome</th>
-                  <th className="px-4 py-2 text-left">E-mail</th>
-                  <th className="px-4 py-2 text-left">Role</th>
-                  <th className="px-4 py-2 text-left">Status</th>
-                  <th className="px-4 py-2 text-left">Criado</th>
+                  <th className="px-4 py-2 text-left">{tc("name")}</th>
+                  <th className="px-4 py-2 text-left">{tc("email")}</th>
+                  <th className="px-4 py-2 text-left">{t("col_role")}</th>
+                  <th className="px-4 py-2 text-left">{tc("status")}</th>
+                  <th className="px-4 py-2 text-left">{tc("created")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -82,17 +87,17 @@ export default async function AdminUsersPage() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Convidar administrador</CardTitle>
-            <CardDescription>Convite expira em 7 dias.</CardDescription>
+            <CardTitle>{t("invite_admin")}</CardTitle>
+            <CardDescription>{t("invite_admin_desc")}</CardDescription>
           </CardHeader>
           <CardContent>
             <form action={inviteAdmin} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">E-mail</Label>
+                <Label htmlFor="email">{tc("email")}</Label>
                 <Input id="email" name="email" type="email" required />
               </div>
               <Button type="submit" className="w-full">
-                Enviar convite
+                {tc("send_invite")}
               </Button>
             </form>
           </CardContent>
@@ -102,15 +107,15 @@ export default async function AdminUsersPage() {
       {invitations.length > 0 && (
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>Convites recentes</CardTitle>
+            <CardTitle>{tc("recent_invites")}</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <table className="w-full text-sm">
               <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
                 <tr>
-                  <th className="px-4 py-2 text-left">E-mail</th>
-                  <th className="px-4 py-2 text-left">Status</th>
-                  <th className="px-4 py-2 text-left">Expira</th>
+                  <th className="px-4 py-2 text-left">{tc("email")}</th>
+                  <th className="px-4 py-2 text-left">{tc("status")}</th>
+                  <th className="px-4 py-2 text-left">{tc("expires")}</th>
                 </tr>
               </thead>
               <tbody>

@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
+import { getTranslations } from "next-intl/server";
 
 export default async function AdminBatchesPage() {
   const batches = await prisma.collectionBatch.findMany({
@@ -10,24 +11,28 @@ export default async function AdminBatchesPage() {
     take: 50,
     include: { tenant: true },
   });
+
+  const t = await getTranslations("admin");
+  const tc = await getTranslations("common");
+
   return (
     <div>
       <PageHeader
-        title="Batches"
-        description="Execuções diárias de coleta e consolidação por tenant."
+        title={t("batches_title")}
+        description={t("batches_desc")}
       />
       <Card>
         <CardContent className="p-0">
           <table className="w-full text-sm">
             <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
               <tr>
-                <th className="px-4 py-3 text-left">Tenant</th>
-                <th className="px-4 py-3 text-left">Tipo</th>
-                <th className="px-4 py-3 text-left">Status</th>
-                <th className="px-4 py-3 text-right">Coletados</th>
-                <th className="px-4 py-3 text-right">Falhas</th>
-                <th className="px-4 py-3 text-left">Agendado</th>
-                <th className="px-4 py-3 text-left">Finalizado</th>
+                <th className="px-4 py-3 text-left">{t("col_tenant")}</th>
+                <th className="px-4 py-3 text-left">{t("col_type")}</th>
+                <th className="px-4 py-3 text-left">{tc("status")}</th>
+                <th className="px-4 py-3 text-right">{t("col_collected")}</th>
+                <th className="px-4 py-3 text-right">{t("col_failures")}</th>
+                <th className="px-4 py-3 text-left">{t("col_scheduled")}</th>
+                <th className="px-4 py-3 text-left">{t("col_finished")}</th>
               </tr>
             </thead>
             <tbody>
@@ -58,7 +63,7 @@ export default async function AdminBatchesPage() {
           </table>
           {batches.length === 0 && (
             <p className="p-8 text-center text-sm text-muted-foreground">
-              Nenhum batch executado ainda.
+              {t("batches_empty")}
             </p>
           )}
         </CardContent>

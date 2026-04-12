@@ -338,7 +338,9 @@
     "nav_tenants": "Tenants",
     "nav_admins": "Admins Gerais",
     "nav_batches": "Batches",
-    "nav_integrations": "Integracoes"
+    "nav_integrations": "Integracoes",
+    "tenants_empty": "Nenhum tenant ainda.",
+    "login_google": "Entrar com Google"
   },
   "validation": {
     "required": "Campo obrigatorio",

@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getTranslations } from "next-intl/server";
 
 async function setupWithGoogle() {
   "use server";
@@ -26,6 +27,8 @@ export default async function NimbusSetupPage() {
     notFound();
   }
 
+  const t = await getTranslations("admin");
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#0f1b3f] p-6">
       <Card className="w-full max-w-xl border-border">
@@ -37,14 +40,8 @@ export default async function NimbusSetupPage() {
             height={120}
             className="mb-2"
           />
-          <CardTitle className="mt-4">
-            Bootstrap da plataforma Nimbus Frugal
-          </CardTitle>
-          <CardDescription>
-            Este formulario aparece apenas uma vez. Ele cria o primeiro
-            Administrador Geral e bloqueia permanentemente este caminho. Futuros
-            administradores gerais so entrarao por convite.
-          </CardDescription>
+          <CardTitle className="mt-4">{t("setup_title")}</CardTitle>
+          <CardDescription>{t("setup_desc")}</CardDescription>
         </CardHeader>
         <CardContent>
           <form action={setupWithGoogle} className="space-y-4">
@@ -67,11 +64,10 @@ export default async function NimbusSetupPage() {
                   fill="#EA4335"
                 />
               </svg>
-              Configurar com Google
+              {t("setup_google")}
             </Button>
             <p className="text-center text-xs text-muted-foreground">
-              Ao continuar, sua conta Google sera registrada como Administrador
-              Geral e o setup sera bloqueado permanentemente.
+              {t("setup_warning")}
             </p>
           </form>
         </CardContent>

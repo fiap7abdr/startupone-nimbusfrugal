@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getTranslations } from "next-intl/server";
 
 async function adminLogin(formData: FormData) {
   "use server";
@@ -35,6 +36,10 @@ export default async function AdminLoginPage({
 }) {
   const state = await prisma.platformSetupState.findFirst();
   const sp = await searchParams;
+  const t = await getTranslations("admin");
+  const tc = await getTranslations("common");
+  const tauth = await getTranslations("auth");
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#0f1b3f] p-6">
       <Card className="w-full max-w-md">
@@ -46,24 +51,22 @@ export default async function AdminLoginPage({
             height={80}
             className="mb-2"
           />
-          <CardTitle className="mt-4">Acesso administrativo</CardTitle>
-          <CardDescription>
-            Área restrita a Administradores Gerais da Nimbus Frugal.
-          </CardDescription>
+          <CardTitle className="mt-4">{t("login_title")}</CardTitle>
+          <CardDescription>{t("login_desc")}</CardDescription>
         </CardHeader>
         <CardContent>
           {!state?.setupCompleted && (
             <div className="mb-4 rounded-md border border-[#fbbf24]/30 bg-[#fef3c7] p-3 text-sm text-[#92400e]">
-              Plataforma ainda não foi inicializada. Use{" "}
+              {t("login_not_initialized")}{" "}
               <a href="/nimbus-setup" className="underline">
-                /nimbus-setup
+                {t("login_setup_path")}
               </a>{" "}
-              para criar o primeiro administrador.
+              {t("login_setup_suffix")}
             </div>
           )}
           {sp.error === "forbidden" && (
             <div className="mb-4 rounded-md border border-negative/20 bg-negative/10 p-3 text-sm text-negative">
-              E-mail não autorizado.
+              {t("login_unauthorized")}
             </div>
           )}
           <form action={adminLoginWithGoogle}>
@@ -74,7 +77,7 @@ export default async function AdminLoginPage({
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
               </svg>
-              Entrar com Google
+              {tauth("login_google")}
             </Button>
           </form>
 
@@ -83,17 +86,17 @@ export default async function AdminLoginPage({
               <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">ou</span>
+              <span className="bg-card px-2 text-muted-foreground">{tc("or")}</span>
             </div>
           </div>
 
           <form action={adminLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">E-mail administrativo</Label>
+              <Label htmlFor="email">{tc("email")}</Label>
               <Input id="email" name="email" type="email" required />
             </div>
             <Button type="submit" className="w-full">
-              Enviar magic link
+              {tauth("send_magic_link")}
             </Button>
           </form>
         </CardContent>

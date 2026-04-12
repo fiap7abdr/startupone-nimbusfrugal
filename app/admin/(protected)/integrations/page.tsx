@@ -3,29 +3,34 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 import { formatDate, connectorLabel } from "@/lib/utils";
+import { getTranslations } from "next-intl/server";
 
 export default async function AdminIntegrationsPage() {
   const integrations = await prisma.integration.findMany({
     orderBy: { createdAt: "desc" },
     include: { tenant: true },
   });
+
+  const t = await getTranslations("admin");
+  const tc = await getTranslations("common");
+
   return (
     <div>
       <PageHeader
-        title="Integrações"
-        description="Visão global de integrações AWS por tenant."
+        title={t("integrations_title")}
+        description={t("integrations_desc")}
       />
       <Card>
         <CardContent className="p-0">
           <table className="w-full text-sm">
             <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
               <tr>
-                <th className="px-4 py-3 text-left">Tenant</th>
-                <th className="px-4 py-3 text-left">Conector</th>
-                <th className="px-4 py-3 text-left">Modo</th>
-                <th className="px-4 py-3 text-left">Status</th>
-                <th className="px-4 py-3 text-left">Health</th>
-                <th className="px-4 py-3 text-left">Última coleta</th>
+                <th className="px-4 py-3 text-left">{t("col_tenant")}</th>
+                <th className="px-4 py-3 text-left">{t("col_connector")}</th>
+                <th className="px-4 py-3 text-left">{t("col_mode")}</th>
+                <th className="px-4 py-3 text-left">{tc("status")}</th>
+                <th className="px-4 py-3 text-left">{t("col_health")}</th>
+                <th className="px-4 py-3 text-left">{t("col_last_collection")}</th>
               </tr>
             </thead>
             <tbody>
@@ -51,7 +56,7 @@ export default async function AdminIntegrationsPage() {
           </table>
           {integrations.length === 0 && (
             <p className="p-8 text-center text-sm text-muted-foreground">
-              Nenhuma integração registrada.
+              {t("integrations_empty")}
             </p>
           )}
         </CardContent>
