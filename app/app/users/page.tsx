@@ -48,7 +48,7 @@ async function inviteUser(formData: FormData) {
 
   const resend = new Resend(process.env.RESEND_API_KEY);
   await resend.emails.send({
-    from: "Nimbus Frugal <onboarding@resend.dev>",
+    from: "Nimbus Frugal <no-reply@nimbusfrugal.cloud>",
     to: email,
     subject: `Convite para ${tenant.name} — Nimbus Frugal`,
     html: `

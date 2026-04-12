@@ -113,7 +113,7 @@ export async function resendInvite(invitationId: string) {
 
   const resend = new Resend(process.env.RESEND_API_KEY);
   await resend.emails.send({
-    from: "Nimbus Frugal <onboarding@resend.dev>",
+    from: "Nimbus Frugal <no-reply@nimbusfrugal.cloud>",
     to: invitation.email,
     subject: `Convite para ${tenant.name} — Nimbus Frugal`,
     html: `
