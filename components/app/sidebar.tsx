@@ -8,7 +8,6 @@ import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { TenantSwitcher } from "@/components/app/tenant-switcher";
 import { LogoutButton } from "@/components/app/logout-button";
-import { LocaleSwitcher } from "@/components/locale-switcher";
 import {
   LayoutDashboard,
   Cable,
@@ -197,7 +196,6 @@ export function AppSidebar({
             </div>
           )}
 
-          <LocaleSwitcher />
           <LogoutButton />
         </div>
       </aside>

@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { LogoutButton } from "@/components/app/logout-button";
-import { LocaleSwitcher } from "@/components/locale-switcher";
 import {
   LayoutDashboard,
   Building2,
@@ -63,7 +62,6 @@ export function AdminSidebar({ adminEmail }: { adminEmail: string }) {
         })}
       </nav>
       <div className="border-t border-white/10 p-3 space-y-2">
-        <LocaleSwitcher className="text-white/60 hover:text-white px-1" />
         <LogoutButton />
       </div>
     </aside>

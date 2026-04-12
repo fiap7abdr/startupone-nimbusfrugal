@@ -1,4 +1,5 @@
 import { AppSidebar } from "@/components/app/sidebar";
+import { LocaleSwitcher } from "@/components/locale-switcher";
 import { requireTenant } from "@/lib/tenant";
 import { cookies } from "next/headers";
 
@@ -33,6 +34,7 @@ export default async function AppLayout({
       <div className="flex-1 overflow-auto">
         <main className="mx-auto max-w-6xl p-8">{children}</main>
       </div>
+      <LocaleSwitcher className="fixed bottom-4 right-4 z-40 rounded-full bg-card border border-border shadow-lg px-3 py-2 text-sm" />
     </div>
   );
 }
