@@ -11,6 +11,7 @@ import {
   Cable,
   Database,
   Users,
+  UserCircle,
   ShieldCheck,
 } from "lucide-react";
 
@@ -23,6 +24,7 @@ export function AdminSidebar({ adminEmail }: { adminEmail: string }) {
     { href: "/admin/tenants", label: t("nav_tenants"), icon: Building2 },
     { href: "/admin/integrations", label: t("nav_integrations"), icon: Cable },
     { href: "/admin/batches", label: t("nav_batches"), icon: Database },
+    { href: "/admin/users", label: t("nav_users"), icon: UserCircle },
     { href: "/admin/admin-users", label: t("nav_admins"), icon: Users },
   ];
 

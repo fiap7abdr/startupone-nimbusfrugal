@@ -349,7 +349,21 @@
     "nav_batches": "Batches",
     "nav_integrations": "Integrações",
     "tenants_empty": "Nenhum tenant ainda.",
-    "login_google": "Entrar com Google"
+    "login_google": "Entrar com Google",
+    "nav_users": "Usuários",
+    "users_title": "Usuários",
+    "users_desc": "Todos os usuários registrados na plataforma.",
+    "users_empty": "Nenhum usuário registrado.",
+    "col_user_name": "Nome",
+    "col_user_email": "E-mail",
+    "col_user_tenants": "Tenants",
+    "col_user_created": "Cadastro",
+    "no_tenants": "Sem tenant",
+    "delete_user": "Excluir usuário",
+    "delete_user_confirm": "Tem certeza que deseja excluir",
+    "delete_user_confirm_suffix": "? Todos os dados do usuário serão removidos permanentemente (memberships, sessões, conta). Tenants onde ele é owner também serão excluídos.",
+    "delete_user_is_owner": "Owner de tenant",
+    "col_actions": "Ações"
   },
   "validation": {
     "required": "Campo obrigatório",
