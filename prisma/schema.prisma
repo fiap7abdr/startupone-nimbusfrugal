@@ -194,6 +194,7 @@ model TenantInvitation {
   status             String    @default("pending")
   expiresAt          DateTime
   createdAt          DateTime  @default(now())
+  lastSentAt         DateTime  @default(now())
   acceptedAt         DateTime?
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)

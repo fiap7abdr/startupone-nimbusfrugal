@@ -16,6 +16,9 @@ import { formatDate } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
 import { inviteUserSchema } from "@/lib/validations";
 import { getTranslations } from "next-intl/server";
+import { Resend } from "resend";
+import { MembersTable } from "./members-table";
+import { InvitationsTable } from "./invitations-table";
 
 async function inviteUser(formData: FormData) {
   "use server";
@@ -39,6 +42,34 @@ async function inviteUser(formData: FormData) {
       expiresAt,
     },
   });
+
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://nimbusfrugal.cloud";
+  const inviteUrl = `${baseUrl}/invitations/${invitation.token}`;
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  await resend.emails.send({
+    from: "Nimbus Frugal <onboarding@resend.dev>",
+    to: email,
+    subject: `Convite para ${tenant.name} — Nimbus Frugal`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 32px 0;">
+        <h2 style="color: #1E3A8A;">Nimbus Frugal</h2>
+        <p>Olá,</p>
+        <p><strong>${user.name ?? user.email}</strong> convidou você para o tenant <strong>${tenant.name}</strong> como <strong>${targetGroup}</strong>.</p>
+        <p>Clique no botão abaixo para aceitar o convite:</p>
+        <a href="${inviteUrl}" style="display: inline-block; background: #1E3A8A; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+          Aceitar convite
+        </a>
+        <p style="margin-top: 24px; font-size: 13px; color: #6B7280;">
+          Este convite expira em 7 dias. Se você não solicitou este convite, ignore este email.
+        </p>
+        <p style="font-size: 13px; color: #6B7280;">
+          Link direto: <a href="${inviteUrl}">${inviteUrl}</a>
+        </p>
+      </div>
+    `,
+  });
+
   await prisma.auditLog.create({
     data: {
       tenantId: tenant.id,
@@ -53,7 +84,8 @@ async function inviteUser(formData: FormData) {
 }
 
 export default async function UsersPage() {
-  const { tenant } = await requireTenant();
+  const { user, tenant } = await requireTenant();
+  const isOwner = tenant.ownerUserId === user.id;
   const [t, tc] = await Promise.all([
     getTranslations("users"),
     getTranslations("common"),
@@ -70,6 +102,29 @@ export default async function UsersPage() {
     }),
   ]);
 
+  const memberEmails = new Set(members.map((m) => m.user.email));
+
+  const serializedMembers = members.map((m) => ({
+    id: m.id,
+    userId: m.userId,
+    targetGroup: m.targetGroup,
+    membershipStatus: m.membershipStatus,
+    joinedAt: m.joinedAt.toISOString(),
+    userName: m.user.name,
+    userEmail: m.user.email,
+  }));
+
+  const serializedInvitations = invitations.map((inv) => ({
+    id: inv.id,
+    email: inv.email,
+    token: inv.token,
+    targetGroup: inv.targetGroup,
+    status: inv.status,
+    expiresAt: inv.expiresAt.toISOString(),
+    lastSentAt: (inv.lastSentAt ?? inv.createdAt).toISOString(),
+    isRegistered: memberEmails.has(inv.email),
+  }));
+
   return (
     <div>
       <PageHeader
@@ -83,35 +138,11 @@ export default async function UsersPage() {
             <CardTitle>{t("members")} ({members.length})</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
-                <tr>
-                  <th className="px-4 py-2 text-left">{t("col_user")}</th>
-                  <th className="px-4 py-2 text-left">{t("col_group")}</th>
-                  <th className="px-4 py-2 text-left">{tc("status")}</th>
-                  <th className="px-4 py-2 text-left">{t("col_joined")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {members.map((m) => (
-                  <tr key={m.id} className="border-t border-border">
-                    <td className="px-4 py-2">
-                      <p className="font-medium">{m.user.name ?? "—"}</p>
-                      <p className="text-xs text-muted-foreground">{m.user.email}</p>
-                    </td>
-                    <td className="px-4 py-2">
-                      <Badge>{m.targetGroup}</Badge>
-                    </td>
-                    <td className="px-4 py-2 text-muted-foreground">
-                      {m.membershipStatus}
-                    </td>
-                    <td className="px-4 py-2 text-muted-foreground">
-                      {formatDate(m.joinedAt)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <MembersTable
+              members={serializedMembers}
+              currentUserId={user.id}
+              isOwner={isOwner}
+            />
           </CardContent>
         </Card>
 
@@ -154,42 +185,7 @@ export default async function UsersPage() {
             <CardTitle>{tc("recent_invites")}</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
-                <tr>
-                  <th className="px-4 py-2 text-left">{tc("email")}</th>
-                  <th className="px-4 py-2 text-left">{t("col_group")}</th>
-                  <th className="px-4 py-2 text-left">{tc("status")}</th>
-                  <th className="px-4 py-2 text-left">{tc("link")}</th>
-                  <th className="px-4 py-2 text-left">{tc("expires")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {invitations.map((inv) => (
-                  <tr key={inv.id} className="border-t border-border">
-                    <td className="px-4 py-2">{inv.email}</td>
-                    <td className="px-4 py-2">
-                      <Badge>{inv.targetGroup}</Badge>
-                    </td>
-                    <td className="px-4 py-2">
-                      <Badge variant="muted">{inv.status}</Badge>
-                    </td>
-                    <td className="px-4 py-2">
-                      {inv.status === "pending" ? (
-                        <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
-                          /invitations/{inv.token}
-                        </code>
-                      ) : (
-                        <span className="text-muted-foreground">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-2 text-muted-foreground">
-                      {formatDate(inv.expiresAt)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <InvitationsTable invitations={serializedInvitations} />
           </CardContent>
         </Card>
       )}
