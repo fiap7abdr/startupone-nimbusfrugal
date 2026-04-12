@@ -6,6 +6,7 @@ import { OrgDetailClient } from "./org-detail-client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 export default async function OrgDetailPage({
   params,
@@ -14,6 +15,7 @@ export default async function OrgDetailPage({
 }) {
   const { orgId } = await params;
   const { tenant } = await requireTenant();
+  const t = await getTranslations("integrations");
 
   const org = await prisma.awsOrganization.findFirst({
     where: { id: orgId, tenantId: tenant.id },
@@ -58,14 +60,14 @@ export default async function OrgDetailPage({
         <Button asChild variant="ghost" size="sm">
           <Link href="/app/integrations">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Voltar para organizacoes
+            {t("back_to_orgs")}
           </Link>
         </Button>
       </div>
 
       <PageHeader
         title={org.organizationName}
-        description={`Configuracao da organizacao ${org.organizationId} e seus conectores AWS.`}
+        description={`${t("org_config")} ${org.organizationId} ${t("org_config_suffix")}`}
       />
 
       <OrgDetailClient org={orgData} platformAccountId={platformAccountId} />

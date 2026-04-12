@@ -27,6 +27,7 @@ import {
   AlertCircle,
   FileCode,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface IntegrationData {
   id: string;
@@ -56,6 +57,8 @@ export function OrgDetailClient({
   org: OrgData;
   platformAccountId: string;
 }) {
+  const t = useTranslations("integrations");
+  const tc = useTranslations("common");
   const [editing, setEditing] = useState(false);
   const activeCount = org.integrations.filter((i) => i.status === "active").length;
   const totalCount = org.integrations.length;
@@ -68,17 +71,17 @@ export function OrgDetailClient({
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
-                Dados da organizacao
+                {t("org_data")}
                 <OrgStatusBadge status={org.organizationStatus} />
               </CardTitle>
               <CardDescription>
-                Conectores: <strong>{activeCount}/{totalCount}</strong> ativos
+                {t("connectors_title")}: <strong>{activeCount}/{totalCount}</strong> {t("connectors_active")}
               </CardDescription>
             </div>
             {!editing && (
               <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
                 <Pencil className="mr-2 h-4 w-4" />
-                Editar
+                {tc("edit")}
               </Button>
             )}
           </div>
@@ -94,7 +97,7 @@ export function OrgDetailClient({
             >
               <input type="hidden" name="orgId" value={org.id} />
               <div className="space-y-2">
-                <Label htmlFor="organizationName">Nome da organizacao</Label>
+                <Label htmlFor="organizationName">{t("org_name")}</Label>
                 <Input
                   id="organizationName"
                   name="organizationName"
@@ -103,7 +106,7 @@ export function OrgDetailClient({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="organizationId">Organization ID</Label>
+                <Label htmlFor="organizationId">{t("org_id")}</Label>
                 <Input
                   id="organizationId"
                   name="organizationId"
@@ -112,7 +115,7 @@ export function OrgDetailClient({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="managementAccountId">Management Account ID</Label>
+                <Label htmlFor="managementAccountId">{t("management_account")}</Label>
                 <Input
                   id="managementAccountId"
                   name="managementAccountId"
@@ -121,26 +124,26 @@ export function OrgDetailClient({
                 />
               </div>
               <div className="flex items-center gap-2 md:col-span-3">
-                <SubmitButton pendingText="Salvando...">
-                  Salvar
+                <SubmitButton pendingText={tc("saving")}>
+                  {tc("save")}
                 </SubmitButton>
                 <Button type="button" variant="ghost" onClick={() => setEditing(false)}>
-                  Cancelar
+                  {tc("cancel")}
                 </Button>
               </div>
             </form>
           ) : (
             <div className="grid gap-3 text-sm md:grid-cols-3">
-              <InfoRow label="Nome" value={org.organizationName} />
+              <InfoRow label={tc("name")} value={org.organizationName} />
               <InfoRow label="Organization ID" value={org.organizationId} mono />
-              <InfoRow label="Management Account" value={org.managementAccountId} mono />
+              <InfoRow label={t("management_account")} value={org.managementAccountId} mono />
             </div>
           )}
         </CardContent>
       </Card>
 
       {/* Connectors */}
-      <h2 className="text-lg font-semibold">Conectores</h2>
+      <h2 className="text-lg font-semibold">{t("connectors_title")}</h2>
 
       {org.integrations.map((integration) => (
         <ConnectorCard
@@ -160,6 +163,8 @@ function ConnectorCard({
   integration: IntegrationData;
   platformAccountId: string;
 }) {
+  const t = useTranslations("integrations");
+  const tc = useTranslations("common");
   const [showCf, setShowCf] = useState(false);
   const roleName = connectorRoleName(integration.connectorType);
 
@@ -183,7 +188,7 @@ function ConnectorCard({
                 {connectorLabel(integration.connectorType)}
               </CardTitle>
               <CardDescription>
-                Role: <span className="font-mono">{roleName}</span> · Health: {integration.healthStatus}
+                {t("role_label")} <span className="font-mono">{roleName}</span> · {t("health_label")} {integration.healthStatus}
               </CardDescription>
             </div>
           </div>
@@ -193,32 +198,32 @@ function ConnectorCard({
 
       <CardContent className="space-y-4">
         <div className="grid gap-3 text-sm md:grid-cols-3">
-          <InfoRow label="External ID" value={integration.externalId} mono />
-          <InfoRow label="Trust Principal (Nimbus)" value={integration.trustPrincipalAccountId} mono />
-          <InfoRow label="Ultima coleta" value={formatDate(integration.lastSuccessfulCollection)} />
+          <InfoRow label={t("external_id")} value={integration.externalId} mono />
+          <InfoRow label={t("trust_principal")} value={integration.trustPrincipalAccountId} mono />
+          <InfoRow label={t("last_collection")} value={formatDate(integration.lastSuccessfulCollection)} />
         </div>
 
         <form action={saveRoleArn} className="flex flex-col gap-3 md:flex-row md:items-end">
           <input type="hidden" name="integrationId" value={integration.id} />
           <div className="flex-1 space-y-2">
-            <Label htmlFor={`role-${integration.id}`}>Role ARN</Label>
+            <Label htmlFor={`role-${integration.id}`}>{t("role_arn")}</Label>
             <Input
               id={`role-${integration.id}`}
               name="roleArn"
               defaultValue={integration.roleArn ?? ""}
-              placeholder={`arn:aws:iam::123456789012:role/${roleName}`}
+              placeholder={`${t("role_arn_placeholder")}${roleName}`}
             />
           </div>
-          <SubmitButton variant="outline" pendingText="Salvando...">
-            Salvar
+          <SubmitButton variant="outline" pendingText={tc("saving")}>
+            {tc("save")}
           </SubmitButton>
         </form>
 
         <div className="flex items-center gap-2">
           <form action={runHealthCheck}>
             <input type="hidden" name="integrationId" value={integration.id} />
-            <SubmitButton pendingText="Verificando...">
-              Health check
+            <SubmitButton pendingText={t("checking")}>
+              {t("health_check")}
             </SubmitButton>
           </form>
 
@@ -229,7 +234,7 @@ function ConnectorCard({
             onClick={() => setShowCf(!showCf)}
           >
             <FileCode className="mr-2 h-4 w-4" />
-            {showCf ? "Ocultar" : "Ver"} CloudFormation
+            {showCf ? t("hide_cf") : t("show_cf")}
           </Button>
         </div>
 
@@ -240,7 +245,7 @@ function ConnectorCard({
         )}
 
         {integration.lastError && (
-          <p className="text-xs text-negative">Ultimo erro: {integration.lastError}</p>
+          <p className="text-xs text-negative">{t("last_error")} {integration.lastError}</p>
         )}
       </CardContent>
     </Card>
@@ -269,6 +274,7 @@ function ConnectorBadge({ status }: { status: string }) {
 }
 
 function OrgStatusBadge({ status }: { status: string }) {
-  if (status === "active") return <Badge variant="positive">ativa</Badge>;
+  const t = useTranslations("integrations");
+  if (status === "active") return <Badge variant="positive">{t("org_active")}</Badge>;
   return <Badge variant="muted">{status}</Badge>;
 }

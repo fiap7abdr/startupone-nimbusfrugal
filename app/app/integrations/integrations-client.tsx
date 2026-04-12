@@ -32,6 +32,7 @@ import {
   Circle,
   AlertCircle,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface IntegrationSummary {
   status: string;
@@ -47,6 +48,8 @@ interface OrgData {
 }
 
 export function IntegrationsClient({ orgs }: { orgs: OrgData[] }) {
+  const t = useTranslations("integrations");
+  const tc = useTranslations("common");
   const [showAddForm, setShowAddForm] = useState(false);
 
   return (
@@ -58,45 +61,45 @@ export function IntegrationsClient({ orgs }: { orgs: OrgData[] }) {
       {showAddForm ? (
         <Card>
           <CardHeader>
-            <CardTitle>Adicionar AWS Organization</CardTitle>
+            <CardTitle>{t("add_org")}</CardTitle>
             <CardDescription>
-              Informe os dados da organizacao e a conta management.
+              {t("add_org_desc")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form action={addOrganization} className="grid gap-4 md:grid-cols-3">
               <div className="space-y-2">
-                <Label htmlFor="organizationName">Nome da organizacao</Label>
+                <Label htmlFor="organizationName">{t("org_name")}</Label>
                 <Input id="organizationName" name="organizationName" required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="organizationId">Organization ID</Label>
+                <Label htmlFor="organizationId">{t("org_id")}</Label>
                 <Input
                   id="organizationId"
                   name="organizationId"
-                  placeholder="o-xxxxxxxxxx"
+                  placeholder={t("org_id_placeholder")}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="managementAccountId">Management Account ID</Label>
+                <Label htmlFor="managementAccountId">{t("mgmt_account")}</Label>
                 <Input
                   id="managementAccountId"
                   name="managementAccountId"
-                  placeholder="123456789012"
+                  placeholder={t("mgmt_placeholder")}
                   required
                 />
               </div>
               <div className="flex items-center gap-2 md:col-span-3">
-                <SubmitButton pendingText="Registrando...">
-                  Registrar organizacao
+                <SubmitButton pendingText={t("registering")}>
+                  {t("register_org")}
                 </SubmitButton>
                 <Button
                   type="button"
                   variant="ghost"
                   onClick={() => setShowAddForm(false)}
                 >
-                  Cancelar
+                  {tc("cancel")}
                 </Button>
               </div>
             </form>
@@ -105,7 +108,7 @@ export function IntegrationsClient({ orgs }: { orgs: OrgData[] }) {
       ) : (
         <Button onClick={() => setShowAddForm(true)} variant="outline" className="w-full">
           <Plus className="mr-2 h-4 w-4" />
-          Adicionar AWS Organization
+          {t("add_org")}
         </Button>
       )}
     </div>
@@ -113,6 +116,8 @@ export function IntegrationsClient({ orgs }: { orgs: OrgData[] }) {
 }
 
 function OrgCard({ org }: { org: OrgData }) {
+  const t = useTranslations("integrations");
+  const tc = useTranslations("common");
   const [deleteConfirm, setDeleteConfirm] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const activeCount = org.integrations.filter((i) => i.status === "active").length;
@@ -137,7 +142,7 @@ function OrgCard({ org }: { org: OrgData }) {
             <Button asChild variant="ghost" size="sm">
               <Link href={`/app/integrations/${org.id}`}>
                 <Settings2 className="mr-2 h-4 w-4" />
-                Configurar
+                {t("configure")}
               </Link>
             </Button>
 
@@ -149,10 +154,9 @@ function OrgCard({ org }: { org: OrgData }) {
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Remover organizacao</DialogTitle>
+                  <DialogTitle>{t("remove_org")}</DialogTitle>
                   <DialogDescription>
-                    Isso removera a organizacao <strong>{org.organizationName}</strong> e todos
-                    os seus conectores. Digite o nome da organizacao para confirmar.
+                    {t("remove_org_warning")} <strong>{org.organizationName}</strong> {t("remove_org_confirm")}
                   </DialogDescription>
                 </DialogHeader>
                 <Input
@@ -166,9 +170,9 @@ function OrgCard({ org }: { org: OrgData }) {
                     <SubmitButton
                       variant="destructive"
                       disabled={deleteConfirm !== org.organizationName}
-                      pendingText="Removendo..."
+                      pendingText={t("removing")}
                     >
-                      Remover
+                      {tc("delete")}
                     </SubmitButton>
                   </form>
                 </DialogFooter>
@@ -181,7 +185,7 @@ function OrgCard({ org }: { org: OrgData }) {
       <CardContent>
         <div className="flex items-center gap-4 text-sm">
           <span className="text-muted-foreground">
-            Conectores: <strong className="text-foreground">{activeCount}/{totalCount}</strong> ativos
+            {t("connectors_count")} <strong className="text-foreground">{activeCount}/{totalCount}</strong> {t("connectors_active")}
           </span>
           <div className="flex items-center gap-2">
             {org.integrations.map((i, idx) => (
@@ -201,6 +205,7 @@ function StatusDot({ status }: { status: string }) {
 }
 
 function OrgStatusBadge({ status }: { status: string }) {
-  if (status === "active") return <Badge variant="positive">ativa</Badge>;
+  const t = useTranslations("integrations");
+  if (status === "active") return <Badge variant="positive">{t("org_active")}</Badge>;
   return <Badge variant="muted">{status}</Badge>;
 }

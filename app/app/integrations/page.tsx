@@ -2,9 +2,11 @@ import { PageHeader } from "@/components/app/page-header";
 import { prisma } from "@/lib/prisma";
 import { requireTenant } from "@/lib/tenant";
 import { IntegrationsClient } from "./integrations-client";
+import { getTranslations } from "next-intl/server";
 
 export default async function IntegrationsPage() {
   const { tenant } = await requireTenant();
+  const t = await getTranslations("integrations");
 
   const organizations = await prisma.awsOrganization.findMany({
     where: { tenantId: tenant.id },
@@ -29,8 +31,8 @@ export default async function IntegrationsPage() {
   return (
     <div>
       <PageHeader
-        title="Integracoes AWS"
-        description="Gerencie suas AWS Organizations e conectores. Cada conector usa uma IAM Role separada com permissoes least-privilege."
+        title={t("title")}
+        description={t("description")}
       />
       <IntegrationsClient orgs={orgs} />
     </div>

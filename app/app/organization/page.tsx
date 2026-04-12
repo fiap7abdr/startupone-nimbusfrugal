@@ -14,6 +14,7 @@ import {
   Server,
   Crown,
 } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 interface OUNode {
   id: string;
@@ -78,6 +79,7 @@ function buildTree(
 
 export default async function OrganizationPage() {
   const { tenant } = await requireTenant();
+  const t = await getTranslations("organization");
 
   const organizations = await prisma.awsOrganization.findMany({
     where: { tenantId: tenant.id },
@@ -91,18 +93,18 @@ export default async function OrganizationPage() {
   return (
     <div>
       <PageHeader
-        title="AWS Organizations"
-        description="Estrutura de contas descoberta via AWS Organizations. Atualizada a cada batch diario."
+        title={t("title")}
+        description={t("description")}
       />
 
       {organizations.length === 0 ? (
         <Card>
           <CardContent className="p-8 text-center text-sm text-muted-foreground">
-            Nenhuma organizacao registrada.{" "}
+            {t("empty_state")}{" "}
             <a href="/app/integrations" className="font-medium text-primary hover:underline">
-              Adicione uma AWS Organization
+              {t("empty_cta")}
             </a>{" "}
-            para comecar.
+            {t("empty_suffix")}
           </CardContent>
         </Card>
       ) : (
@@ -121,8 +123,8 @@ export default async function OrganizationPage() {
                         <CardTitle>{org.organizationName}</CardTitle>
                         <p className="text-sm text-muted-foreground">
                           <span className="font-mono">{org.organizationId}</span>
-                          {" · "}Management: <span className="font-mono">{org.managementAccountId}</span>
-                          {" · "}{totalAccounts} conta{totalAccounts !== 1 && "s"}
+                          {" · "}{t("management")}: <span className="font-mono">{org.managementAccountId}</span>
+                          {" · "}{totalAccounts} {t("accounts_label")}
                         </p>
                       </div>
                     </div>
@@ -135,9 +137,9 @@ export default async function OrganizationPage() {
                 <CardContent>
                   {roots.length === 0 && unassignedAccounts.length === 0 ? (
                     <p className="text-sm text-muted-foreground">
-                      Estrutura ainda nao descoberta. Execute o health check do conector AWS Organizations na{" "}
+                      {t("tree_pending")}{" "}
                       <a href={`/app/integrations/${org.id}`} className="font-medium text-primary hover:underline">
-                        pagina de integracoes
+                        {t("tree_pending_link")}
                       </a>.
                     </p>
                   ) : (

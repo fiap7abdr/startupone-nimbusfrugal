@@ -12,9 +12,12 @@ import { prisma } from "@/lib/prisma";
 import { formatDate, connectorLabel } from "@/lib/utils";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { getTranslations } from "next-intl/server";
 
 export default async function DashboardPage() {
   const { tenant } = await requireTenant();
+  const t = await getTranslations("dashboard");
+  const tc = await getTranslations("common");
 
   const [
     integrations,
@@ -47,8 +50,8 @@ export default async function DashboardPage() {
   return (
     <div>
       <PageHeader
-        title="Dashboard"
-        description="Visão consolidada da sua AWS Organization, recomendações e freshness dos conectores."
+        title={t("title")}
+        description={t("description")}
       />
 
       {needsOnboarding && (
@@ -56,43 +59,42 @@ export default async function DashboardPage() {
           <CardContent className="flex flex-col items-start gap-4 p-6 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-base font-semibold text-accent-foreground">
-                Complete o onboarding para começar a coletar dados
+                {t("onboarding_title")}
               </p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Registre sua AWS Organization e conecte a conta management.
+                {t("onboarding_desc")}
               </p>
             </div>
             <Button asChild>
-              <Link href="/app/integrations">Adicionar AWS Organization</Link>
+              <Link href="/app/integrations">{t("onboarding_cta")}</Link>
             </Button>
           </CardContent>
         </Card>
       )}
 
       <div className="grid gap-4 md:grid-cols-4">
-        <Metric label="Integrações" value={integrations.toString()} sub={`${activeIntegrations} ativas`} />
-        <Metric label="Contas AWS" value={accounts.toString()} sub="descobertas via Organizations" />
-        <Metric label="Recomendações abertas" value={recCount.toString()} sub="priorizadas" />
+        <Metric label={t("metric_integrations")} value={integrations.toString()} sub={`${activeIntegrations} ativas`} />
+        <Metric label={t("metric_accounts")} value={accounts.toString()} sub={t("metric_accounts_desc")} />
+        <Metric label={t("metric_recommendations")} value={recCount.toString()} sub={t("metric_recommendations_desc")} />
         <Metric
-          label="Último batch"
+          label={t("metric_last_batch")}
           value={lastBatch ? lastBatch.status : "—"}
-          sub={lastBatch ? formatDate(lastBatch.scheduledAt) : "nenhum ainda"}
+          sub={lastBatch ? formatDate(lastBatch.scheduledAt) : t("metric_no_batch")}
         />
       </div>
 
       <div className="mt-8 grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Freshness por conector</CardTitle>
+            <CardTitle>{t("freshness_title")}</CardTitle>
             <CardDescription>
-              Os dados são atualizados em batch a cada 24h. Nimbus Frugal não é
-              real-time.
+              {t("freshness_desc")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {freshness.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                Nenhum conector coletou dados ainda.
+                {t("freshness_empty")}
               </p>
             ) : (
               <ul className="space-y-3">
@@ -117,18 +119,18 @@ export default async function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Plano</CardTitle>
-            <CardDescription>Status de billing do tenant</CardDescription>
+            <CardTitle>{t("billing_title")}</CardTitle>
+            <CardDescription>{t("billing_desc")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <div className="flex items-center justify-between">
-              <span>Plano atual</span>
+              <span>{t("billing_current")}</span>
               <Badge>{tenant.plan}</Badge>
             </div>
             <div className="flex items-center justify-between">
-              <span>Modelo</span>
+              <span>{tc("model")}</span>
               <span className="text-muted-foreground">
-                0,5% do gasto mensal consolidado
+                {t("billing_model")}
               </span>
             </div>
             <div className="flex items-center justify-between">
