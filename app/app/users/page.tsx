@@ -43,7 +43,7 @@ async function inviteUser(formData: FormData) {
     },
   });
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://nimbusfrugal.cloud";
+  const baseUrl = process.env.NODE_ENV === "production" ? "https://nimbusfrugal.cloud" : (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3100");
   const inviteUrl = `${baseUrl}/invitations/${invitation.token}`;
 
   const resend = new Resend(process.env.RESEND_API_KEY);
