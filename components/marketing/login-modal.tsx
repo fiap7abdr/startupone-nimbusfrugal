@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,12 +19,14 @@ import { loginWithGoogle, loginWithEmail } from "@/lib/auth-actions";
 
 export function LoginModal() {
   const [open, setOpen] = useState(false);
+  const t = useTranslations("auth");
+  const tc = useTranslations("common");
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="ghost" size="sm">
-          Entrar
+          {t("do_login")}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-sm">
@@ -35,9 +38,9 @@ export function LoginModal() {
             height={64}
             className="mb-2"
           />
-          <DialogTitle>Entrar na Nimbus Frugal</DialogTitle>
+          <DialogTitle>{t("login_title")}</DialogTitle>
           <DialogDescription>
-            Use sua conta Google ou receba um link de acesso por e-mail.
+            {t("login_desc")}
           </DialogDescription>
         </DialogHeader>
 
@@ -62,7 +65,7 @@ export function LoginModal() {
                   fill="#EA4335"
                 />
               </svg>
-              Entrar com Google
+              {t("login_google")}
             </Button>
           </form>
 
@@ -72,34 +75,34 @@ export function LoginModal() {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-card px-2 text-muted-foreground">
-                ou com e-mail
+                {t("or_email")}
               </span>
             </div>
           </div>
 
           <form action={loginWithEmail} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="modal-email">E-mail</Label>
+              <Label htmlFor="modal-email">{tc("email")}</Label>
               <Input
                 id="modal-email"
                 name="email"
                 type="email"
-                placeholder="voce@empresa.com"
+                placeholder={t("email_placeholder")}
                 required
               />
             </div>
             <Button type="submit" className="w-full">
-              Enviar magic link
+              {t("send_magic_link")}
             </Button>
           </form>
 
           <p className="text-center text-xs text-muted-foreground">
-            Nao tem conta?{" "}
+            {t("no_account")}{" "}
             <Link
               href="/signup"
               className="font-medium text-primary hover:underline"
             >
-              Criar uma
+              {t("create_one")}
             </Link>
           </p>
         </div>

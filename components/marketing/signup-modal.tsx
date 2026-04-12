@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,12 +22,14 @@ interface SignupModalProps {
 
 export function SignupModal({ trigger }: SignupModalProps) {
   const [open, setOpen] = useState(false);
+  const t = useTranslations("auth");
+  const tl = useTranslations("landing");
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger ?? (
-          <Button size="sm">Comecar gratis</Button>
+          <Button size="sm">{tl("hero_cta")}</Button>
         )}
       </DialogTrigger>
       <DialogContent className="max-w-sm">
@@ -38,9 +41,9 @@ export function SignupModal({ trigger }: SignupModalProps) {
             height={64}
             className="mb-2"
           />
-          <DialogTitle>Criar conta Nimbus Frugal</DialogTitle>
+          <DialogTitle>{t("signup_title")}</DialogTitle>
           <DialogDescription>
-            Comece o trial de 90 dias. Crie seu tenant apos o cadastro.
+            {t("signup_desc")}
           </DialogDescription>
         </DialogHeader>
 
@@ -65,7 +68,7 @@ export function SignupModal({ trigger }: SignupModalProps) {
                   fill="#EA4335"
                 />
               </svg>
-              Cadastrar com Google
+              {t("signup_google")}
             </Button>
           </form>
 
@@ -75,33 +78,33 @@ export function SignupModal({ trigger }: SignupModalProps) {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-card px-2 text-muted-foreground">
-                ou com e-mail
+                {t("or_email")}
               </span>
             </div>
           </div>
 
           <form action={createAccount} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="signup-name">Seu nome</Label>
+              <Label htmlFor="signup-name">{t("your_name")}</Label>
               <Input
                 id="signup-name"
                 name="name"
-                placeholder="Ana Souza"
+                placeholder={t("name_placeholder")}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="signup-email">E-mail corporativo</Label>
+              <Label htmlFor="signup-email">{t("corp_email")}</Label>
               <Input
                 id="signup-email"
                 name="email"
                 type="email"
-                placeholder="ana@empresa.com"
+                placeholder={t("corp_email_placeholder")}
                 required
               />
             </div>
             <Button type="submit" className="w-full">
-              Criar conta e enviar magic link
+              {t("signup_submit")}
             </Button>
           </form>
         </div>

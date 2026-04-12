@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { LoginModal } from "@/components/marketing/login-modal";
 import { SignupModal } from "@/components/marketing/signup-modal";
+import { LocaleSwitcher } from "@/components/locale-switcher";
 
 export function SiteHeader() {
   return (
@@ -19,6 +20,7 @@ export function SiteHeader() {
           </span>
         </Link>
         <div className="flex items-center gap-3">
+          <LocaleSwitcher />
           <LoginModal />
           <SignupModal />
         </div>
