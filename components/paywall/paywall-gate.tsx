@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,6 +23,8 @@ export function PaywallGate({
   children,
   featureName = "esta funcionalidade",
 }: PaywallGateProps) {
+  const t = useTranslations("paywall");
+
   if (hasAccess) return <>{children}</>;
 
   return (
@@ -30,18 +33,18 @@ export function PaywallGate({
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent">
           <ShieldCheck className="h-6 w-6 text-accent-foreground" />
         </div>
-        <CardTitle className="mt-4">Acesso restrito</CardTitle>
+        <CardTitle className="mt-4">{t("title")}</CardTitle>
         <CardDescription>
-          Seu trial expirou. Faça upgrade para PRO para continuar usando{" "}
+          {t("expired_message")}{" "}
           {featureName}.
         </CardDescription>
       </CardHeader>
       <CardContent className="text-center">
         <Button asChild className="w-full">
-          <Link href="/app/settings">Fazer upgrade</Link>
+          <Link href="/app/settings">{t("upgrade_cta")}</Link>
         </Button>
         <p className="mt-3 text-xs text-muted-foreground">
-          PRO: 0,5% do gasto mensal consolidado AWS
+          {t("pro_price")}
         </p>
       </CardContent>
     </Card>

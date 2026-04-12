@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { ChevronDown, Lock, Settings2, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 interface TenantOption {
   id: string;
@@ -18,10 +19,11 @@ export function TenantSwitcher({
   activeTenantId: string;
   isTrial: boolean;
 }) {
+  const t = useTranslations("sidebar");
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [switchingId, setSwitchingId] = useState<string | null>(null);
-  const active = tenants.find((t) => t.id === activeTenantId) ?? tenants[0];
+  const active = tenants.find((ten) => ten.id === activeTenantId) ?? tenants[0];
 
   if (tenants.length <= 1 && isTrial) {
     return (
@@ -58,29 +60,29 @@ export function TenantSwitcher({
             onClick={() => setOpen(false)}
           />
           <div className="absolute left-0 top-full z-50 mt-1 w-52 rounded-md border border-white/20 bg-[#1a3178] py-1 shadow-lg">
-            {tenants.map((t) => (
+            {tenants.map((ten) => (
               <button
-                key={t.id}
+                key={ten.id}
                 type="button"
                 disabled={switchingId !== null}
-                onClick={() => switchTenant(t.id)}
+                onClick={() => switchTenant(ten.id)}
                 className={`flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs disabled:opacity-50 ${
-                  t.id === activeTenantId
+                  ten.id === activeTenantId
                     ? "bg-primary/30 font-medium text-white"
                     : "text-white/80 hover:bg-white/10"
                 }`}
               >
-                {switchingId === t.id && (
+                {switchingId === ten.id && (
                   <Loader2 className="h-3 w-3 animate-spin shrink-0" />
                 )}
-                {t.name}
+                {ten.name}
               </button>
             ))}
             <div className="mx-2 my-1 border-t border-white/10" />
             {isTrial ? (
               <div className="flex w-full items-center gap-2 px-3 py-1.5 text-xs text-white/40">
                 <Lock className="h-3 w-3" />
-                Multiplas empresas disponivel no Pro
+                {t("multi_company_pro")}
               </div>
             ) : (
               <a
@@ -89,7 +91,7 @@ export function TenantSwitcher({
                 className="flex w-full items-center gap-2 px-3 py-1.5 text-xs text-white/60 hover:bg-white/10 hover:text-white/90"
               >
                 <Settings2 className="h-3 w-3" />
-                Gerenciar Empresas
+                {t("manage_companies")}
               </a>
             )}
           </div>

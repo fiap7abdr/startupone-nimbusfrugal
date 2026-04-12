@@ -4,9 +4,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { TenantSwitcher } from "@/components/app/tenant-switcher";
 import { LogoutButton } from "@/components/app/logout-button";
+import { LocaleSwitcher } from "@/components/locale-switcher";
 import {
   LayoutDashboard,
   Cable,
@@ -19,15 +21,6 @@ import {
   Menu,
   Loader2,
 } from "lucide-react";
-
-const NAV = [
-  { href: "/app/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/app/integrations", label: "Integracoes AWS", icon: Cable },
-  { href: "/app/organization", label: "Organizacao AWS", icon: Network },
-  { href: "/app/recommendations", label: "Recomendacoes", icon: Sparkles },
-  { href: "/app/users", label: "Usuarios", icon: Users },
-  { href: "/app/settings", label: "Settings", icon: Settings },
-];
 
 interface TenantOption {
   id: string;
@@ -47,11 +40,21 @@ export function AppSidebar({
   plan: string;
   trialEndsAt: string | null;
 }) {
+  const t = useTranslations("sidebar");
   const pathname = usePathname();
   const router = useRouter();
   const isTrial = plan === "TRIAL";
   const [navigating, setNavigating] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  const NAV = [
+    { href: "/app/dashboard", label: t("dashboard"), icon: LayoutDashboard },
+    { href: "/app/integrations", label: t("integrations"), icon: Cable },
+    { href: "/app/organization", label: t("organization"), icon: Network },
+    { href: "/app/recommendations", label: t("recommendations"), icon: Sparkles },
+    { href: "/app/users", label: t("users"), icon: Users },
+    { href: "/app/settings", label: t("settings"), icon: Settings },
+  ];
 
   const trialDaysLeft = trialEndsAt
     ? Math.max(0, Math.ceil((new Date(trialEndsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
@@ -154,7 +157,7 @@ export function AppSidebar({
           {isTrial && (
             <Link
               href="/app/upgrade"
-              title="Upgrade para Pro"
+              title={t("upgrade_pro")}
               onClick={(e) => handleNavClick("/app/upgrade", e)}
               aria-disabled={isNavigating}
               className={cn(
@@ -169,10 +172,10 @@ export function AppSidebar({
                 <Zap className="h-4 w-4 shrink-0" />
               )}
               <div className="hidden min-w-0 flex-1 group-hover/sidebar:block">
-                <span className="text-sm font-semibold">Upgrade para Pro</span>
+                <span className="text-sm font-semibold">{t("upgrade_pro")}</span>
                 {trialDaysLeft > 0 && (
                   <p className="text-[10px] font-normal text-white/80">
-                    {trialDaysLeft} dias restantes no trial
+                    {trialDaysLeft} {t("trial_days")}
                   </p>
                 )}
               </div>
@@ -181,7 +184,7 @@ export function AppSidebar({
 
           {!isTrial && (
             <div
-              title="Plano Pro"
+              title={t("pro_plan")}
               className={cn(
                 "flex items-center rounded-md bg-white/10 text-sm",
                 "justify-center p-2 group-hover/sidebar:justify-start group-hover/sidebar:gap-3 group-hover/sidebar:px-3",
@@ -189,11 +192,12 @@ export function AppSidebar({
             >
               <Crown className="h-4 w-4 shrink-0 text-[#F59E0B]" />
               <span className="hidden font-medium text-white/90 group-hover/sidebar:inline">
-                Plano Pro
+                {t("pro_plan")}
               </span>
             </div>
           )}
 
+          <LocaleSwitcher />
           <LogoutButton />
         </div>
       </aside>

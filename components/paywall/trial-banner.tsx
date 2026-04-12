@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { Clock } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface TrialBannerProps {
   daysLeft: number;
 }
 
 export function TrialBanner({ daysLeft }: TrialBannerProps) {
+  const t = useTranslations("paywall");
+
   if (daysLeft <= 0) return null;
 
   const urgent = daysLeft <= 7;
@@ -24,15 +27,15 @@ export function TrialBanner({ daysLeft }: TrialBannerProps) {
         <Clock className="h-4 w-4" />
         <span>
           {daysLeft === 1
-            ? "Seu trial expira amanhã"
-            : `${daysLeft} dias restantes no trial`}
+            ? t("expires_tomorrow")
+            : `${daysLeft} ${t("trial_days")}`}
         </span>
       </div>
       <Link
         href="/app/settings"
         className="font-medium underline underline-offset-4 hover:opacity-80"
       >
-        Fazer upgrade
+        {t("upgrade_cta")}
       </Link>
     </div>
   );
