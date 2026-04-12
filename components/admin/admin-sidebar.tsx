@@ -13,6 +13,7 @@ import {
   Users,
   UserCircle,
   ShieldCheck,
+  ScrollText,
 } from "lucide-react";
 
 export function AdminSidebar({ adminEmail }: { adminEmail: string }) {
@@ -26,6 +27,7 @@ export function AdminSidebar({ adminEmail }: { adminEmail: string }) {
     { href: "/admin/batches", label: t("nav_batches"), icon: Database },
     { href: "/admin/users", label: t("nav_users"), icon: UserCircle },
     { href: "/admin/admin-users", label: t("nav_admins"), icon: Users },
+    { href: "/admin/audit", label: t("nav_audit"), icon: ScrollText },
   ];
 
   return (

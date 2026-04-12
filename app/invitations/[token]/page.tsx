@@ -15,6 +15,7 @@ import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
 import { Users } from "lucide-react";
 import Link from "next/link";
+import { createAuditLog } from "@/lib/audit";
 
 async function acceptInvitation(token: string, userEmail: string) {
   const invitation = await prisma.tenantInvitation.findUnique({
@@ -53,15 +54,15 @@ async function acceptInvitation(token: string, userEmail: string) {
     data: { status: "accepted", acceptedAt: new Date() },
   });
 
-  await prisma.auditLog.create({
-    data: {
-      tenantId: invitation.tenantId,
-      entityType: "tenant_invitation",
-      entityId: invitation.id,
-      action: "invitation.accepted",
-      actor: user.email,
-      actorType: "user",
-    },
+  await createAuditLog({
+    tenantId: invitation.tenantId,
+    entityType: "tenant_invitation",
+    entityId: invitation.id,
+    action: "invitation.accepted",
+    actor: user.email,
+    module: "invitations",
+    summary: `Aceitou convite para ${invitation.tenant.name}`,
+    after: { email: userEmail, targetGroup: invitation.targetGroup },
   });
 
   const cookieStore = await cookies();

@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { requireTenant } from "@/lib/tenant";
+import { createAuditLog } from "@/lib/audit";
 import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
 
@@ -14,6 +15,7 @@ export async function removeMember(memberId: string) {
 
   const member = await prisma.tenantMember.findUnique({
     where: { id: memberId },
+    include: { user: true },
   });
 
   if (!member || member.tenantId !== tenant.id) {
@@ -26,15 +28,15 @@ export async function removeMember(memberId: string) {
 
   await prisma.tenantMember.delete({ where: { id: memberId } });
 
-  await prisma.auditLog.create({
-    data: {
-      tenantId: tenant.id,
-      entityType: "tenant_member",
-      entityId: memberId,
-      action: "member.removed",
-      actor: user.email,
-      actorType: "user",
-    },
+  await createAuditLog({
+    tenantId: tenant.id,
+    entityType: "tenant_member",
+    entityId: memberId,
+    action: "member.removed",
+    actor: user.email,
+    module: "users",
+    summary: `Removeu ${member.user.name ?? member.user.email} do tenant`,
+    before: { userId: member.userId, email: member.user.email, role: member.targetGroup },
   });
 
   revalidatePath("/app/users");
@@ -53,6 +55,7 @@ export async function changeMemberRole(memberId: string, newRole: string) {
 
   const member = await prisma.tenantMember.findUnique({
     where: { id: memberId },
+    include: { user: true },
   });
 
   if (!member || member.tenantId !== tenant.id) {
@@ -63,21 +66,23 @@ export async function changeMemberRole(memberId: string, newRole: string) {
     throw new Error("You cannot change your own role.");
   }
 
+  const oldRole = member.targetGroup;
+
   await prisma.tenantMember.update({
     where: { id: memberId },
     data: { targetGroup: newRole },
   });
 
-  await prisma.auditLog.create({
-    data: {
-      tenantId: tenant.id,
-      entityType: "tenant_member",
-      entityId: memberId,
-      action: "member.role_changed",
-      actor: user.email,
-      actorType: "user",
-      metadataJson: { newRole },
-    },
+  await createAuditLog({
+    tenantId: tenant.id,
+    entityType: "tenant_member",
+    entityId: memberId,
+    action: "member.role_changed",
+    actor: user.email,
+    module: "users",
+    summary: `Alterou role de ${member.user.name ?? member.user.email} de ${oldRole} para ${newRole}`,
+    before: { role: oldRole },
+    after: { role: newRole },
   });
 
   revalidatePath("/app/users");
@@ -99,7 +104,6 @@ export async function resendInvite(invitationId: string) {
     throw new Error("Invitation is not pending.");
   }
 
-  // Reset expiration
   const newExpiry = new Date();
   newExpiry.setDate(newExpiry.getDate() + 7);
 
@@ -135,15 +139,14 @@ export async function resendInvite(invitationId: string) {
     `,
   });
 
-  await prisma.auditLog.create({
-    data: {
-      tenantId: tenant.id,
-      entityType: "tenant_invitation",
-      entityId: invitationId,
-      action: "invitation.resent",
-      actor: user.email,
-      actorType: "user",
-    },
+  await createAuditLog({
+    tenantId: tenant.id,
+    entityType: "tenant_invitation",
+    entityId: invitationId,
+    action: "invitation.resent",
+    actor: user.email,
+    module: "invitations",
+    summary: `Reenviou convite para ${invitation.email}`,
   });
 
   revalidatePath("/app/users");
@@ -160,7 +163,6 @@ export async function deleteInvite(invitationId: string) {
     throw new Error("Invitation not found.");
   }
 
-  // If user already registered via this invite, remove from tenant
   const invitedUser = await prisma.user.findUnique({
     where: { email: invitation.email },
   });
@@ -175,15 +177,15 @@ export async function deleteInvite(invitationId: string) {
     where: { id: invitationId },
   });
 
-  await prisma.auditLog.create({
-    data: {
-      tenantId: tenant.id,
-      entityType: "tenant_invitation",
-      entityId: invitationId,
-      action: "invitation.deleted",
-      actor: user.email,
-      actorType: "user",
-    },
+  await createAuditLog({
+    tenantId: tenant.id,
+    entityType: "tenant_invitation",
+    entityId: invitationId,
+    action: "invitation.deleted",
+    actor: user.email,
+    module: "invitations",
+    summary: `Excluiu convite de ${invitation.email}${invitedUser ? " e removeu do tenant" : ""}`,
+    before: { email: invitation.email, status: invitation.status, targetGroup: invitation.targetGroup },
   });
 
   revalidatePath("/app/users");

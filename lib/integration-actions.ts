@@ -5,6 +5,7 @@ import { requireTenant } from "@/lib/tenant";
 import { registerOrgSchema, roleArnSchema } from "@/lib/validations";
 import { randomExternalId } from "@/lib/utils";
 import { CONNECTOR_TYPES } from "@/lib/aws-cloudformation";
+import { createAuditLog } from "@/lib/audit";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -47,15 +48,15 @@ export async function addOrganization(formData: FormData) {
     })),
   });
 
-  await prisma.auditLog.create({
-    data: {
-      tenantId: tenant.id,
-      entityType: "aws_organization",
-      entityId: org.id,
-      action: "organization.registered",
-      actor: tenant.ownerUserId,
-      actorType: "user",
-    },
+  await createAuditLog({
+    tenantId: tenant.id,
+    entityType: "aws_organization",
+    entityId: org.id,
+    action: "organization.registered",
+    actor: tenant.ownerUserId,
+    module: "organizations",
+    summary: `Registrou AWS Organization ${organizationName} (${organizationId})`,
+    after: { organizationName, organizationId, managementAccountId },
   });
 
   revalidatePath(PAGE_PATH);
@@ -83,15 +84,16 @@ export async function updateOrganization(formData: FormData) {
     data: { organizationName, organizationId, managementAccountId },
   });
 
-  await prisma.auditLog.create({
-    data: {
-      tenantId: tenant.id,
-      entityType: "aws_organization",
-      entityId: org.id,
-      action: "organization.updated",
-      actor: tenant.ownerUserId,
-      actorType: "user",
-    },
+  await createAuditLog({
+    tenantId: tenant.id,
+    entityType: "aws_organization",
+    entityId: org.id,
+    action: "organization.updated",
+    actor: tenant.ownerUserId,
+    module: "organizations",
+    summary: `Atualizou AWS Organization ${organizationName}`,
+    before: { organizationName: org.organizationName, organizationId: org.organizationId, managementAccountId: org.managementAccountId },
+    after: { organizationName, organizationId, managementAccountId },
   });
 
   revalidatePath(PAGE_PATH);
@@ -108,15 +110,15 @@ export async function removeOrganization(formData: FormData) {
   });
   if (!org) return;
 
-  await prisma.auditLog.create({
-    data: {
-      tenantId: tenant.id,
-      entityType: "aws_organization",
-      entityId: org.id,
-      action: "organization.removed",
-      actor: tenant.ownerUserId,
-      actorType: "user",
-    },
+  await createAuditLog({
+    tenantId: tenant.id,
+    entityType: "aws_organization",
+    entityId: org.id,
+    action: "organization.removed",
+    actor: tenant.ownerUserId,
+    module: "organizations",
+    summary: `Removeu AWS Organization ${org.organizationName}`,
+    before: { organizationName: org.organizationName, organizationId: org.organizationId },
   });
 
   // Cascade deletes integrations, OUs, accounts
@@ -145,15 +147,16 @@ export async function saveRoleArn(formData: FormData) {
     data: { roleArn },
   });
 
-  await prisma.auditLog.create({
-    data: {
-      tenantId: tenant.id,
-      entityType: "integration",
-      entityId: integrationId,
-      action: "integration.role_arn_set",
-      actor: tenant.ownerUserId,
-      actorType: "user",
-    },
+  await createAuditLog({
+    tenantId: tenant.id,
+    entityType: "integration",
+    entityId: integrationId,
+    action: "integration.role_arn_set",
+    actor: tenant.ownerUserId,
+    module: "integrations",
+    summary: `Configurou Role ARN do conector ${integration.connectorType}`,
+    before: { roleArn: integration.roleArn },
+    after: { roleArn },
   });
 
   revalidatePath(PAGE_PATH);

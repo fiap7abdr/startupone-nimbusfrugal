@@ -16,6 +16,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { generateTenantSlug } from "@/lib/utils";
 import { createTenantSchema } from "@/lib/validations";
+import { createAuditLog } from "@/lib/audit";
 
 async function createTenant(formData: FormData) {
   "use server";
@@ -64,15 +65,15 @@ async function createTenant(formData: FormData) {
     },
   });
 
-  await prisma.auditLog.create({
-    data: {
-      tenantId: tenant.id,
-      entityType: "tenant",
-      entityId: tenant.id,
-      action: "tenant.created",
-      actor: user.email,
-      actorType: "user",
-    },
+  await createAuditLog({
+    tenantId: tenant.id,
+    entityType: "tenant",
+    entityId: tenant.id,
+    action: "tenant.created",
+    actor: user.email,
+    module: "tenants",
+    summary: `Criou tenant ${tenantName}`,
+    after: { name: tenantName, slug, plan: "TRIAL" },
   });
 
   const cookieStore = await cookies();

@@ -6,9 +6,10 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createTenantSchema } from "@/lib/validations";
 import { generateTenantSlug } from "@/lib/utils";
+import { createAuditLog } from "@/lib/audit";
 
 export async function upgradeToPro() {
-  const { tenant } = await requireTenant();
+  const { tenant, user } = await requireTenant();
 
   const billing = await prisma.billingSubscription.findUnique({
     where: { tenantId: tenant.id },
@@ -32,6 +33,18 @@ export async function upgradeToPro() {
       data: { plan: "PRO" },
     }),
   ]);
+
+  await createAuditLog({
+    tenantId: tenant.id,
+    entityType: "billing_subscription",
+    entityId: tenant.id,
+    action: "billing.upgraded",
+    actor: user.email,
+    module: "billing",
+    summary: `Upgrade para PRO`,
+    before: { plan: billing.plan },
+    after: { plan: "PRO" },
+  });
 
   redirect("/app/settings");
 }
@@ -78,15 +91,15 @@ export async function createAdditionalTenant(formData: FormData) {
     },
   });
 
-  await prisma.auditLog.create({
-    data: {
-      tenantId: newTenant.id,
-      entityType: "tenant",
-      entityId: newTenant.id,
-      action: "tenant.created",
-      actor: user.email,
-      actorType: "user",
-    },
+  await createAuditLog({
+    tenantId: newTenant.id,
+    entityType: "tenant",
+    entityId: newTenant.id,
+    action: "tenant.created",
+    actor: user.email,
+    module: "tenants",
+    summary: `Criou tenant adicional ${tenantName}`,
+    after: { name: tenantName, slug, plan: "PRO" },
   });
 
   const cookieStore = await cookies();
@@ -112,15 +125,15 @@ export async function deleteTenant(tenantId: string) {
     redirect("/app/tenants");
   }
 
-  await prisma.auditLog.create({
-    data: {
-      tenantId,
-      entityType: "tenant",
-      entityId: tenantId,
-      action: "tenant.deleted",
-      actor: user.email,
-      actorType: "user",
-    },
+  await createAuditLog({
+    tenantId,
+    entityType: "tenant",
+    entityId: tenantId,
+    action: "tenant.deleted",
+    actor: user.email,
+    module: "tenants",
+    summary: `Excluiu tenant ${target.tenant.name}`,
+    before: { name: target.tenant.name, slug: target.tenant.slug },
   });
 
   await prisma.tenant.delete({ where: { id: tenantId } });

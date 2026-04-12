@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { createAuditLog } from "@/lib/audit";
 
 export default async function NimbusSetupCompletePage() {
   const state = await prisma.platformSetupState.findFirst();
@@ -59,14 +60,14 @@ export default async function NimbusSetupCompletePage() {
     },
   });
 
-  await prisma.auditLog.create({
-    data: {
-      entityType: "admin_user",
-      entityId: admin.id,
-      action: "platform.bootstrap",
-      actor: admin.email,
-      actorType: "admin",
-    },
+  await createAuditLog({
+    entityType: "admin_user",
+    entityId: admin.id,
+    action: "platform.bootstrap",
+    actor: admin.email,
+    actorType: "admin",
+    module: "platform",
+    summary: `Bootstrap da plataforma por ${admin.email}`,
   });
 
   redirect("/nimbus-setup/done");

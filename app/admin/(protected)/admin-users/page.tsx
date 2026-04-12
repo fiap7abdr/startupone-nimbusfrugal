@@ -9,6 +9,7 @@ import { requireAdmin } from "@/lib/tenant";
 import { formatDate } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
+import { createAuditLog } from "@/lib/audit";
 
 async function inviteAdmin(formData: FormData) {
   "use server";
@@ -20,14 +21,15 @@ async function inviteAdmin(formData: FormData) {
   await prisma.adminInvitation.create({
     data: { email, invitedByAdminUserId: admin.id, expiresAt },
   });
-  await prisma.auditLog.create({
-    data: {
-      entityType: "admin_invitation",
-      entityId: email,
-      action: "admin_invitation.created",
-      actor: admin.email,
-      actorType: "admin",
-    },
+  await createAuditLog({
+    entityType: "admin_invitation",
+    entityId: email,
+    action: "admin_invitation.created",
+    actor: admin.email,
+    actorType: "admin",
+    module: "admin",
+    summary: `Convidou admin ${email}`,
+    after: { email },
   });
   revalidatePath("/admin/admin-users");
 }

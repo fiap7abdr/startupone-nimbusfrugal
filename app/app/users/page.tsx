@@ -17,6 +17,7 @@ import { revalidatePath } from "next/cache";
 import { inviteUserSchema } from "@/lib/validations";
 import { getTranslations } from "next-intl/server";
 import { Resend } from "resend";
+import { createAuditLog } from "@/lib/audit";
 import { MembersTable } from "./members-table";
 import { InvitationsTable } from "./invitations-table";
 import { InviteSubmitButton } from "./invite-submit-button";
@@ -71,15 +72,15 @@ async function inviteUser(formData: FormData) {
     `,
   });
 
-  await prisma.auditLog.create({
-    data: {
-      tenantId: tenant.id,
-      entityType: "tenant_invitation",
-      entityId: invitation.id,
-      action: "invitation.created",
-      actor: user.email,
-      actorType: "user",
-    },
+  await createAuditLog({
+    tenantId: tenant.id,
+    entityType: "tenant_invitation",
+    entityId: invitation.id,
+    action: "invitation.created",
+    actor: user.email,
+    module: "invitations",
+    summary: `Convidou ${email} como ${targetGroup}`,
+    after: { email, targetGroup },
   });
   revalidatePath("/app/users");
 }

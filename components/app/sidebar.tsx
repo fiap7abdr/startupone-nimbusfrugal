@@ -19,6 +19,7 @@ import {
   Zap,
   Menu,
   Loader2,
+  ScrollText,
 } from "lucide-react";
 
 interface TenantOption {
@@ -52,6 +53,7 @@ export function AppSidebar({
     { href: "/app/organization", label: t("organization"), icon: Network },
     { href: "/app/recommendations", label: t("recommendations"), icon: Sparkles },
     { href: "/app/users", label: t("users"), icon: Users },
+    { href: "/app/audit", label: t("audit"), icon: ScrollText },
     { href: "/app/settings", label: t("settings"), icon: Settings },
   ];
 

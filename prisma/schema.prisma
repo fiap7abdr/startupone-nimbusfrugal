@@ -379,10 +379,17 @@ model AuditLog {
   action      String
   actor       String
   actorType   String   @default("user") // user | admin | system
+  module      String   @default("general") // users, invitations, integrations, billing, admin, tenants, organizations
+  summary     String?
+  beforeJson  Json?
+  afterJson   Json?
   timestamp   DateTime @default(now())
   metadataJson Json?
 
   tenant Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
 
+  @@index([tenantId, timestamp])
+  @@index([actor, timestamp])
+  @@index([module, timestamp])
   @@map("audit_logs")
 }
