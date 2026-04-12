@@ -18,6 +18,7 @@ Plataforma FinOps SaaS multi-tenant para AWS com atualizacao diaria e foco em vi
 | Storybook 8 (react-vite) | Documentacao de componentes |
 | TanStack Query | Data fetching client |
 | Zod | Validacao |
+| next-intl | Internacionalizacao (pt-BR + en) |
 | shadcn/ui (cva) | Componentes UI |
 
 ## Rotas
@@ -38,7 +39,7 @@ Plataforma FinOps SaaS multi-tenant para AWS com atualizacao diaria e foco em vi
 - `/app/recommendations` — oportunidades priorizadas
 - `/app/users` — membros, convites, grupos owner/read
 - `/app/settings` — billing e preferencias
-- `/app/companies` — gerenciar empresas (criar, alternar, excluir) — somente Pro
+- `/app/tenants` — gerenciar tenants (criar, alternar, excluir) — somente Pro
 - `/app/upgrade` — upgrade de plano Trial → Pro com consentimento
 
 ### Admin Global
@@ -86,8 +87,8 @@ Plataforma FinOps SaaS multi-tenant para AWS com atualizacao diaria e foco em vi
 
 | Plano | Preco | Duracao | Empresas |
 |---|---|---|---|
-| **Trial** | Gratis | 90 dias, tudo ilimitado | 1 empresa |
-| **Pro** | 10% da economia realizada (estimated savings) | Ilimitado | Multiplas empresas |
+| **Trial** | Gratis | 90 dias, tudo ilimitado | 1 tenant |
+| **Pro** | 10% da economia realizada (estimated savings) | Ilimitado | Multiplos tenants |
 
 O upgrade de Trial para Pro e feito em `/app/upgrade` com consentimento do modelo de cobranca. Ao fim de cada mes, somam-se os estimated savings dos recursos identificados e cobra-se 10% desse valor.
 
@@ -103,6 +104,7 @@ design-system/tokens.ts  →  npm run tokens  →  globals.css (CSS vars)  →  
 - Componentes: Button, Card, Badge, Input, Label, Dialog, Tabs, SplitText, SubmitButton
 - Componentes de produto: PaywallGate, TrialBanner
 - Componentes de marketing: LoginModal, SignupModal, SiteHeader, SiteFooter
+- Componente de i18n: LocaleSwitcher (flutuante no canto inferior direito nas areas logadas)
 - **Regra:** nunca usar hex hardcoded — sempre tokens semanticos (`bg-primary`, `text-foreground`)
 
 ## Trial e Subscription
@@ -134,12 +136,24 @@ A rota `/nimbus-setup` e o ponto de entrada inicial da plataforma — uso unico.
 
 ## Multi-tenancy
 
-- Usuario pode pertencer a multiplas empresas (tenants)
-- Trial: limitado a 1 empresa. Pro: multiplas empresas
-- Tenant switcher no sidebar para alternar entre empresas
-- Pagina `/app/companies` para criar e excluir empresas (Pro)
-- Cookie `active-tenant-id` persiste a empresa ativa
+- Usuario pode pertencer a multiplos tenants
+- Trial: limitado a 1 tenant. Pro: multiplos tenants
+- Tenant switcher no sidebar para alternar entre tenants
+- Pagina `/app/tenants` para criar e excluir tenants (Pro)
+- Cookie `active-tenant-id` persiste o tenant ativo
 - Toda query filtra por `tenantId` (isolamento de dados)
+
+## Internacionalizacao (i18n)
+
+- Biblioteca: `next-intl` integrada ao App Router
+- Idiomas: **pt-BR** (padrao) e **en**
+- Deteccao automatica via header `Accept-Language`, com fallback para pt-BR
+- Cookie `NEXT_LOCALE` persiste a escolha do usuario
+- Sem prefixo de locale na URL (ex: `/app/dashboard`, nao `/pt-BR/app/dashboard`)
+- Componente `LocaleSwitcher` flutuante no canto inferior direito (areas logadas)
+- Server Components usam `getTranslations()`, Client Components usam `useTranslations()`
+- Arquivos de traducao em `messages/pt-BR.json` e `messages/en.json` (16 namespaces, 325+ chaves)
+- Middleware configura o cookie de locale automaticamente na primeira visita
 
 ## Modelo operacional
 
@@ -194,7 +208,7 @@ nimbus-frugal/
 │   │   ├── recommendations/
 │   │   ├── users/
 │   │   ├── settings/
-│   │   ├── companies/       # Gerenciar empresas (Pro)
+│   │   ├── tenants/       # Gerenciar tenants (Pro)
 │   │   └── upgrade/         # Upgrade Trial → Pro
 │   ├── admin/               # Admin global
 │   │   ├── login/
@@ -206,7 +220,8 @@ nimbus-frugal/
 │   ├── forms/               # Form components
 │   ├── app/                 # Tenant app layout (sidebar, tenant-switcher, logout-button, page-header)
 │   ├── admin/               # Admin layout (admin-sidebar)
-│   └── marketing/           # LoginModal, SignupModal, SiteHeader, SiteFooter
+│   ├── marketing/           # LoginModal, SignupModal, SiteHeader, SiteFooter
+│   └── locale-switcher.tsx  # Seletor de idioma (pt-BR / en)
 ├── lib/
 │   ├── prisma.ts            # Prisma client singleton
 │   ├── utils.ts             # cn(), slugify(), generateTenantSlug()
@@ -216,11 +231,18 @@ nimbus-frugal/
 │   ├── auth-actions.ts      # Server actions: login/signup (Google, magic link)
 │   ├── actions.ts           # Server actions: logout
 │   ├── validations.ts       # Zod schemas
+│   ├── locale-actions.ts    # Server action: setLocale (cookie NEXT_LOCALE)
 │   └── aws-cloudformation.ts # CloudFormation template generator
 ├── design-system/
 │   ├── tokens.ts            # Source of truth (cores, spacing, tipografia)
 │   ├── utils.ts             # tokenKeyToCssVar, sidebarKeyToCssVar
 │   └── generate-css.ts      # Gera CSS vars no globals.css
+├── i18n/
+│   ├── config.ts            # Locales, defaultLocale, Locale type
+│   └── request.ts           # next-intl request config (cookie + Accept-Language)
+├── messages/
+│   ├── pt-BR.json           # Traducoes em portugues (padrao)
+│   └── en.json              # Traducoes em ingles
 ├── stories/
 │   ├── design-tokens/       # Colors, Typography, Spacing
 │   ├── components/          # Button, Card, Badge, Input, Dialog, Select, Tabs, PaywallGate, TrialBanner, LoginModal, SignupModal, SiteHeader, SiteFooter

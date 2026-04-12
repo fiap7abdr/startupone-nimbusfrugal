@@ -82,16 +82,16 @@ export function TenantSwitcher({
             {isTrial ? (
               <div className="flex w-full items-center gap-2 px-3 py-1.5 text-xs text-white/40">
                 <Lock className="h-3 w-3" />
-                {t("multi_company_pro")}
+                {t("multi_tenant_pro")}
               </div>
             ) : (
               <a
-                href="/app/companies"
+                href="/app/tenants"
                 onClick={() => setOpen(false)}
                 className="flex w-full items-center gap-2 px-3 py-1.5 text-xs text-white/60 hover:bg-white/10 hover:text-white/90"
               >
                 <Settings2 className="h-3 w-3" />
-                {t("manage_companies")}
+                {t("manage_tenants")}
               </a>
             )}
           </div>

@@ -49,9 +49,9 @@
     "solution_reduce_desc": "Significant savings in your spending. Prioritized recommendations with estimated savings.",
     "how_title": "How It Works",
     "how_step1_title": "1. Connect your AWS account",
-    "how_step1_desc": "Connect your AWS Organization with our secure CloudFormation template.",
-    "how_step2_title": "2. We analyze your cloud",
-    "how_step2_desc": "We detect waste and savings opportunities automatically.",
+    "how_step1_desc": "Integrate your AWS Organization in minutes via CloudFormation. Read-only permissions and a unique External ID per tenant.",
+    "how_step2_title": "2. Get prioritized recommendations",
+    "how_step2_desc": "A daily batch cross-references 7 AWS connectors to prioritize the actions with the highest impact on your bill.",
     "trial_title": "Trial",
     "trial_price": "Free",
     "trial_period": "for 90 days",
@@ -124,8 +124,8 @@
     "pro_plan": "Pro Plan",
     "logout": "Sign out",
     "logging_out": "Signing out...",
-    "multi_company_pro": "Multiple tenants available on Pro",
-    "manage_companies": "Manage Tenants"
+    "multi_tenant_pro": "Multiple tenants available on Pro",
+    "manage_tenants": "Manage Tenants"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -235,7 +235,7 @@
     "trial_free": "Free trial",
     "trial_expires": "Trial expires on"
   },
-  "companies": {
+  "tenants": {
     "title": "Tenants",
     "description": "Manage the tenants you belong to.",
     "owner": "Owner",
@@ -249,8 +249,8 @@
     "delete_type": "Type",
     "delete_confirm_suffix": "to confirm",
     "deleting": "Deleting...",
-    "new_company": "New tenant",
-    "company_name": "Tenant name",
+    "new_tenant": "New tenant",
+    "tenant_name": "Tenant name",
     "creating": "Creating..."
   },
   "upgrade": {

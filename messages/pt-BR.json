@@ -49,9 +49,9 @@
     "solution_reduce_desc": "Economias de magnitude em seus gastos com a economia. Recomendacoes priorizadas com estimated savings.",
     "how_title": "Como Funciona",
     "how_step1_title": "1. Conecte sua conta AWS",
-    "how_step1_desc": "Conecte sua AWS Organization com nosso template CloudFormation seguro.",
-    "how_step2_title": "2. Analisamos sua nuvem",
-    "how_step2_desc": "Detectamos desperdicios e oportunidades de economia automaticamente.",
+    "how_step1_desc": "Integre sua AWS Organization em minutos via CloudFormation. Permissoes read-only e External ID unico por tenant.",
+    "how_step2_title": "2. Receba recomendacoes priorizadas",
+    "how_step2_desc": "Batch diario cruza 7 conectores AWS para priorizar as acoes com maior impacto no seu custo.",
     "trial_title": "Trial",
     "trial_price": "Gratis",
     "trial_period": "por 90 dias",
@@ -124,8 +124,8 @@
     "pro_plan": "Plano Pro",
     "logout": "Sair",
     "logging_out": "Saindo...",
-    "multi_company_pro": "Multiplos tenants disponivel no Pro",
-    "manage_companies": "Gerenciar Tenants"
+    "multi_tenant_pro": "Multiplos tenants disponivel no Pro",
+    "manage_tenants": "Gerenciar Tenants"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -235,7 +235,7 @@
     "trial_free": "Trial gratuito",
     "trial_expires": "Trial expira em"
   },
-  "companies": {
+  "tenants": {
     "title": "Tenants",
     "description": "Gerencie os tenants que voce participa.",
     "owner": "Owner",
@@ -249,8 +249,8 @@
     "delete_type": "Digite",
     "delete_confirm_suffix": "para confirmar",
     "deleting": "Excluindo...",
-    "new_company": "Novo tenant",
-    "company_name": "Nome do tenant",
+    "new_tenant": "Novo tenant",
+    "tenant_name": "Nome do tenant",
     "creating": "Criando..."
   },
   "upgrade": {

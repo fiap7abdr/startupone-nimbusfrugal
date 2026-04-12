@@ -104,12 +104,12 @@ export async function deleteTenant(tenantId: string) {
   const { user, memberships } = await requireTenant();
 
   if (memberships.length <= 1) {
-    redirect("/app/companies");
+    redirect("/app/tenants");
   }
 
   const target = memberships.find((m) => m.tenantId === tenantId);
   if (!target || target.tenant.ownerUserId !== user.id) {
-    redirect("/app/companies");
+    redirect("/app/tenants");
   }
 
   await prisma.auditLog.create({
@@ -136,5 +136,5 @@ export async function deleteTenant(tenantId: string) {
     });
   }
 
-  redirect("/app/companies");
+  redirect("/app/tenants");
 }

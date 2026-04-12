@@ -34,7 +34,7 @@ import {
 } from "lucide-react";
 import { createAdditionalTenant, deleteTenant } from "@/lib/billing-actions";
 
-interface Company {
+interface TenantItem {
   id: string;
   name: string;
   slug: string;
@@ -45,14 +45,14 @@ interface Company {
   createdAt: string;
 }
 
-export function CompaniesClient({
-  companies,
+export function TenantsClient({
+  tenants,
   activeTenantId,
 }: {
-  companies: Company[];
+  tenants: TenantItem[];
   activeTenantId: string;
 }) {
-  const t = useTranslations("companies");
+  const t = useTranslations("tenants");
   const tc = useTranslations("common");
   const router = useRouter();
   const [switchingId, setSwitchingId] = useState<string | null>(null);
@@ -69,13 +69,13 @@ export function CompaniesClient({
     router.refresh();
   }
 
-  const companyToDelete = companies.find((c) => c.id === deletingId);
+  const tenantToDelete = tenants.find((c) => c.id === deletingId);
 
   return (
     <div className="space-y-6">
-      {/* Company list */}
+      {/* Tenant list */}
       <div className="grid gap-4">
-        {companies.map((c) => {
+        {tenants.map((c) => {
           const isActive = c.id === activeTenantId;
           const isSwitching = switchingId === c.id;
           return (
@@ -132,7 +132,7 @@ export function CompaniesClient({
                       {isSwitching ? t("switching") : t("switch_btn")}
                     </Button>
                   )}
-                  {c.isOwner && companies.length > 1 && (
+                  {c.isOwner && tenants.length > 1 && (
                     <Dialog
                       open={deletingId === c.id}
                       onOpenChange={(open) => {
@@ -157,7 +157,7 @@ export function CompaniesClient({
                           <DialogTitle>{t("delete_title")}</DialogTitle>
                           <DialogDescription>
                             {t("delete_warning")}{" "}
-                            <strong>{companyToDelete?.name}</strong>{" "}
+                            <strong>{tenantToDelete?.name}</strong>{" "}
                             {t("delete_warning_suffix")}
                           </DialogDescription>
                         </DialogHeader>
@@ -165,13 +165,13 @@ export function CompaniesClient({
                           <div className="space-y-2">
                             <Label>
                               {t("delete_type")}{" "}
-                              <strong>{companyToDelete?.name}</strong>{" "}
+                              <strong>{tenantToDelete?.name}</strong>{" "}
                               {t("delete_confirm_suffix")}
                             </Label>
                             <Input
                               value={confirmName}
                               onChange={(e) => setConfirmName(e.target.value)}
-                              placeholder={companyToDelete?.name}
+                              placeholder={tenantToDelete?.name}
                             />
                           </div>
                           <div className="flex justify-end gap-2">
@@ -187,7 +187,7 @@ export function CompaniesClient({
                             >
                               <SubmitButton
                                 variant="destructive"
-                                disabled={confirmName !== companyToDelete?.name}
+                                disabled={confirmName !== tenantToDelete?.name}
                                 pendingText={t("deleting")}
                               >
                                 {t("delete_title")}
@@ -205,18 +205,18 @@ export function CompaniesClient({
         })}
       </div>
 
-      {/* Add new company */}
+      {/* Add new tenant */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <Plus className="h-4 w-4" />
-            {t("new_company")}
+            {t("new_tenant")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <form action={createAdditionalTenant} className="flex items-end gap-3">
             <div className="flex-1 space-y-2">
-              <Label htmlFor="name">{t("company_name")}</Label>
+              <Label htmlFor="name">{t("tenant_name")}</Label>
               <Input
                 id="name"
                 name="name"

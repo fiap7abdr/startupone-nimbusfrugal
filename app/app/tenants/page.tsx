@@ -2,19 +2,19 @@ import { requireTenant } from "@/lib/tenant";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { PageHeader } from "@/components/app/page-header";
-import { CompaniesClient } from "./companies-client";
+import { TenantsClient } from "./tenants-client";
 import { getTranslations } from "next-intl/server";
 
-export default async function CompaniesPage() {
+export default async function TenantsPage() {
   const { user, tenant, memberships } = await requireTenant();
 
   if (tenant.billing?.plan !== "PRO") {
     redirect("/app/upgrade");
   }
 
-  const t = await getTranslations("companies");
+  const t = await getTranslations("tenants");
 
-  const companies = await Promise.all(
+  const tenants = await Promise.all(
     memberships.map(async (m) => {
       const memberCount = await prisma.tenantMember.count({
         where: { tenantId: m.tenantId, membershipStatus: "active" },
@@ -38,8 +38,8 @@ export default async function CompaniesPage() {
         title={t("title")}
         description={t("description")}
       />
-      <CompaniesClient
-        companies={companies}
+      <TenantsClient
+        tenants={tenants}
         activeTenantId={tenant.id}
       />
     </div>
