@@ -32,7 +32,7 @@ export default async function TenantAuditPage({
 
   if (sp.module) where.module = sp.module;
   if (sp.action) where.action = { contains: sp.action };
-  if (sp.actor) where.actor = { contains: sp.actor };
+  if (sp.actor) where.actorEmail = { contains: sp.actor };
   if (sp.from || sp.to) {
     where.timestamp = {
       ...(sp.from ? { gte: new Date(sp.from) } : {}),
@@ -92,7 +92,7 @@ export default async function TenantAuditPage({
                   <td className="px-4 py-2 whitespace-nowrap text-muted-foreground">
                     {formatDate(log.timestamp)}
                   </td>
-                  <td className="px-4 py-2 font-mono text-xs">{log.actor}</td>
+                  <td className="px-4 py-2 font-mono text-xs">{log.actorEmail ?? log.actor}</td>
                   <td className="px-4 py-2 font-mono text-xs">{log.action}</td>
                   <td className="px-4 py-2">
                     <Badge>{log.module}</Badge>

@@ -7,6 +7,7 @@ interface AuditLogInput {
   entityId: string;
   action: string;
   actor: string;
+  actorEmail?: string;
   actorType?: "user" | "admin" | "system";
   module: string;
   summary?: string;
@@ -23,6 +24,7 @@ export async function createAuditLog(input: AuditLogInput) {
       entityId: input.entityId,
       action: input.action,
       actor: input.actor,
+      actorEmail: input.actorEmail,
       actorType: input.actorType ?? "user",
       module: input.module,
       summary: input.summary,

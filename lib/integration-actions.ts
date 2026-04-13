@@ -13,7 +13,7 @@ import { getTranslations } from "next-intl/server";
 const PAGE_PATH = "/app/integrations";
 
 export async function addOrganization(formData: FormData) {
-  const { tenant } = await requireTenant();
+  const { tenant, user } = await requireTenant();
   const parsed = registerOrgSchema.safeParse({
     organizationName: formData.get("organizationName"),
     organizationId: formData.get("organizationId"),
@@ -53,7 +53,8 @@ export async function addOrganization(formData: FormData) {
     entityType: "aws_organization",
     entityId: org.id,
     action: "organization.registered",
-    actor: tenant.ownerUserId,
+    actor: user.id,
+    actorEmail: user.email,
     module: "organizations",
     summary: `Registrou AWS Organization ${organizationName} (${organizationId})`,
     after: { organizationName, organizationId, managementAccountId },
@@ -64,7 +65,7 @@ export async function addOrganization(formData: FormData) {
 }
 
 export async function updateOrganization(formData: FormData) {
-  const { tenant } = await requireTenant();
+  const { tenant, user } = await requireTenant();
   const orgId = String(formData.get("orgId") ?? "");
   const parsed = registerOrgSchema.safeParse({
     organizationName: formData.get("organizationName"),
@@ -89,7 +90,8 @@ export async function updateOrganization(formData: FormData) {
     entityType: "aws_organization",
     entityId: org.id,
     action: "organization.updated",
-    actor: tenant.ownerUserId,
+    actor: user.id,
+    actorEmail: user.email,
     module: "organizations",
     summary: `Atualizou AWS Organization ${organizationName}`,
     before: { organizationName: org.organizationName, organizationId: org.organizationId, managementAccountId: org.managementAccountId },
@@ -101,7 +103,7 @@ export async function updateOrganization(formData: FormData) {
 }
 
 export async function removeOrganization(formData: FormData) {
-  const { tenant } = await requireTenant();
+  const { tenant, user } = await requireTenant();
   const orgId = String(formData.get("orgId") ?? "");
   if (!orgId) return;
 
@@ -115,7 +117,8 @@ export async function removeOrganization(formData: FormData) {
     entityType: "aws_organization",
     entityId: org.id,
     action: "organization.removed",
-    actor: tenant.ownerUserId,
+    actor: user.id,
+    actorEmail: user.email,
     module: "organizations",
     summary: `Removeu AWS Organization ${org.organizationName}`,
     before: { organizationName: org.organizationName, organizationId: org.organizationId },
@@ -129,7 +132,7 @@ export async function removeOrganization(formData: FormData) {
 }
 
 export async function saveRoleArn(formData: FormData) {
-  const { tenant } = await requireTenant();
+  const { tenant, user } = await requireTenant();
   const parsed = roleArnSchema.safeParse({
     integrationId: formData.get("integrationId"),
     roleArn: formData.get("roleArn"),
@@ -152,7 +155,8 @@ export async function saveRoleArn(formData: FormData) {
     entityType: "integration",
     entityId: integrationId,
     action: "integration.role_arn_set",
-    actor: tenant.ownerUserId,
+    actor: user.id,
+    actorEmail: user.email,
     module: "integrations",
     summary: `Configurou Role ARN do conector ${integration.connectorType}`,
     before: { roleArn: integration.roleArn },

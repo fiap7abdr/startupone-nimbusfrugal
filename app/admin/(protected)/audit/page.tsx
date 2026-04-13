@@ -33,7 +33,7 @@ export default async function AdminAuditPage({
 
   if (sp.module) where.module = sp.module;
   if (sp.action) where.action = { contains: sp.action };
-  if (sp.actor) where.actor = { contains: sp.actor };
+  if (sp.actor) where.actorEmail = { contains: sp.actor };
   if (sp.actorType) where.actorType = sp.actorType;
   if (sp.tenantId) where.tenantId = sp.tenantId;
   if (sp.from || sp.to) {
@@ -104,7 +104,7 @@ export default async function AdminAuditPage({
                     {formatDate(log.timestamp)}
                   </td>
                   <td className="px-4 py-2">
-                    <div className="font-mono text-xs">{log.actor}</div>
+                    <div className="font-mono text-xs">{log.actorEmail ?? log.actor}</div>
                     <Badge variant="muted" className="mt-0.5 text-[10px]">
                       {log.actorType}
                     </Badge>

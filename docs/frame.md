@@ -15,6 +15,7 @@ shaping: true
 > Escopo inicial enxuto: Bootstrap, Landing/Signup, AWS Onboarding, Tenant App, Global Admin Panel.
 > 3 perfis de acesso: Admin Geral, Owner do Tenant, Read.
 > 18 entidades minimas. 7 conectores iniciais.
+> Autenticação exclusivamente via Google OAuth (sem magic link/email).
 
 > Cada conector deve ter sua role com sua policy focada em least privilege.
 

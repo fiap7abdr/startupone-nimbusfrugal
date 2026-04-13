@@ -378,6 +378,7 @@ model AuditLog {
   entityId    String
   action      String
   actor       String
+  actorEmail  String?
   actorType   String   @default("user") // user | admin | system
   module      String   @default("general") // users, invitations, integrations, billing, admin, tenants, organizations
   summary     String?
