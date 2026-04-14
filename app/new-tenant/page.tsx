@@ -17,6 +17,8 @@ import { auth } from "@/auth";
 import { generateTenantSlug } from "@/lib/utils";
 import { createTenantSchema } from "@/lib/validations";
 import { createAuditLog } from "@/lib/audit";
+import { logout } from "@/lib/actions";
+import { SubmitButton } from "./submit-button";
 
 async function createTenant(formData: FormData) {
   "use server";
@@ -131,8 +133,14 @@ export default async function NewTenantPage({
                 required
               />
             </div>
-            <Button type="submit" className="w-full" size="lg">
-              {t("create_tenant")}
+            <SubmitButton
+              label={t("create_tenant")}
+              pendingLabel={t("creating_tenant")}
+            />
+          </form>
+          <form action={logout} className="mt-3">
+            <Button type="submit" variant="ghost" className="w-full" size="sm">
+              {t("logout")}
             </Button>
           </form>
         </CardContent>

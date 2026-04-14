@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import Google from "next-auth/providers/google";
 import { prisma } from "@/lib/prisma";
+import { createAuditLog } from "@/lib/audit";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -15,6 +16,41 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientSecret: process.env.AUTH_GOOGLE_SECRET,
     }),
   ],
+  events: {
+    async signIn({ user, account, isNewUser }) {
+      if (!user?.id || !user?.email) return;
+      await createAuditLog({
+        entityType: "user",
+        entityId: user.id,
+        action: "login_success",
+        actor: user.id,
+        actorEmail: user.email,
+        actorType: "user",
+        module: "auth",
+        summary: `${user.name ?? user.email} fez login via ${account?.provider ?? "unknown"}`,
+        metadata: {
+          method: account?.provider ? `${account.provider}_oauth` : "unknown",
+          provider: account?.provider ?? null,
+          name: user.name ?? null,
+          isNewUser: !!isNewUser,
+        },
+      });
+    },
+    async signOut(message) {
+      const token = "token" in message ? message.token : null;
+      if (!token?.sub || !token.email) return;
+      await createAuditLog({
+        entityType: "user",
+        entityId: token.sub,
+        action: "logout",
+        actor: token.sub,
+        actorEmail: String(token.email),
+        actorType: "user",
+        module: "auth",
+        summary: `${token.email} fez logout`,
+      });
+    },
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user?.email) {

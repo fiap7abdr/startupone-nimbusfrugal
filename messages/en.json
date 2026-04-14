@@ -92,6 +92,8 @@
     "tenant_name": "Tenant name",
     "tenant_placeholder": "Acme FinOps",
     "create_tenant": "Create tenant and start",
+    "creating_tenant": "Creating...",
+    "logout": "Sign out",
     "fill_tenant": "Fill in the tenant name to continue.",
     "invite_title": "Tenant invitation",
     "invite_text": "You have been invited to",

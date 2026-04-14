@@ -56,6 +56,8 @@ shaping: true
 | R9.1 | Audit log centralizado com módulo, resumo, before/after JSON em todas as ações | Must-have |
 | R9.2 | Página de auditoria global no admin com filtros (módulo, ator, tipo de ator, ação, tenant, período) e paginação | Must-have |
 | R9.3 | Página de auditoria por tenant com isolamento multi-tenant e filtros similares | Must-have |
+| 🟡 R9.4 | Eventos de autenticação (`login_success`, `login_failure`, `logout`) registrados no audit log com método (ex.: `google_oauth`), userId, email, nome | Must-have |
+| 🟡 R9.5 | Auditoria do tenant inclui eventos de auth de usuários membros do tenant (isolamento multi-tenant preservado) | Must-have |
 
 ---
 
@@ -77,6 +79,7 @@ Shape A was selected and implemented in the bootstrap phase.
 | **A8** | **Coleta de Dados** — CollectionBatch model com scheduling. DataFreshnessStatus por conector por tenant. Cron job placeholder (não implementado real). | ⚠️ |
 | **A9** | **Design System** — Tokens tipados em TS → CSS variables geradas automaticamente. Tailwind 4 `@theme inline`. shadcn-style components com cva. Storybook 8 react-vite. | |
 | **A10** | **Auditoria** — `lib/audit.ts` centralizado com `createAuditLog()`. AuditLog com module, summary, beforeJson, afterJson, indexes por tenant+timestamp, actor+timestamp, module+timestamp. Páginas `/admin/audit` (global com filtros) e `/app/audit` (tenant-scoped). Sidebar links em ambos painéis. | |
+| 🟡 **A11** | **Audit de autenticação** — `auth.ts` com `events.signIn`/`events.signOut` chamando `createAuditLog` (module="auth", action=`login_success`/`logout`, metadata com `method: google_oauth`, name, isNewUser). `lib/auth-actions.ts` captura exceções do `signIn` (preservando `RedirectError`) para registrar `login_failure`. Query da auditoria do tenant: `OR [{ tenantId }, { module: "auth", actor: { in: memberIds } }]` via lookup em `tenantMember`. | |
 
 ---
 
@@ -123,6 +126,8 @@ Shape A was selected and implemented in the bootstrap phase.
 | R9.1 | Audit log centralizado com módulo, resumo, before/after JSON em todas as ações | Must-have | ✅ |
 | R9.2 | Página de auditoria global no admin com filtros e paginação | Must-have | ✅ |
 | R9.3 | Página de auditoria por tenant com isolamento multi-tenant e filtros similares | Must-have | ✅ |
+| 🟡 R9.4 | Eventos de autenticação registrados no audit log com método, userId, email, nome | Must-have | ✅ |
+| 🟡 R9.5 | Auditoria do tenant inclui eventos de auth de membros (isolamento preservado) | Must-have | ✅ |
 
 **Notes:**
 - A fails R7.2: job mensal que soma estimated savings das recomendações e cobra 10% não implementado (A7 flagged ⚠️)
@@ -146,6 +151,9 @@ Shape A was selected and implemented in the bootstrap phase.
 - Admin: gestão de usuários com delete cascade, auditoria global com filtros
 - Tenant: auditoria scoped com filtros, sidebar com link de auditoria
 - `lib/audit.ts` centralizado — todas as ações passam por `createAuditLog()`
+- 🟡 Eventos de auth (`login_success`, `login_failure`, `logout`) via `events` do Auth.js + wrapper do server action
+- 🟡 Auditoria do tenant expandida: mostra eventos de auth de membros via `memberIds` lookup
+- 🟡 `/new-tenant`: botão de submit com `useFormStatus` (anti-duplo clique) + botão de logout
 - i18n: pt-BR e en completos para todos os módulos
 
 ### Pending (Next Phases)

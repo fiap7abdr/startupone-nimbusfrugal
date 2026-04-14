@@ -28,17 +28,35 @@ export default async function TenantAuditPage({
   const page = Math.max(1, parseInt(sp.page ?? "1", 10));
   const t = await getTranslations("audit");
 
-  const where: Record<string, unknown> = { tenantId: tenant.id };
+  const memberIds = (
+    await prisma.tenantMember.findMany({
+      where: { tenantId: tenant.id },
+      select: { userId: true },
+    })
+  ).map((m) => m.userId);
 
-  if (sp.module) where.module = sp.module;
-  if (sp.action) where.action = { contains: sp.action };
-  if (sp.actor) where.actorEmail = { contains: sp.actor };
+  const baseFilters: Record<string, unknown> = {};
+  if (sp.module) baseFilters.module = sp.module;
+  if (sp.action) baseFilters.action = { contains: sp.action };
+  if (sp.actor) baseFilters.actorEmail = { contains: sp.actor };
   if (sp.from || sp.to) {
-    where.timestamp = {
+    baseFilters.timestamp = {
       ...(sp.from ? { gte: new Date(sp.from) } : {}),
       ...(sp.to ? { lte: new Date(`${sp.to}T23:59:59`) } : {}),
     };
   }
+
+  const where = {
+    AND: [
+      baseFilters,
+      {
+        OR: [
+          { tenantId: tenant.id },
+          { module: "auth", actor: { in: memberIds } },
+        ],
+      },
+    ],
+  };
 
   const [logs, total, modules] = await Promise.all([
     prisma.auditLog.findMany({
@@ -49,7 +67,12 @@ export default async function TenantAuditPage({
     }),
     prisma.auditLog.count({ where }),
     prisma.auditLog.findMany({
-      where: { tenantId: tenant.id },
+      where: {
+        OR: [
+          { tenantId: tenant.id },
+          { module: "auth", actor: { in: memberIds } },
+        ],
+      },
       select: { module: true },
       distinct: ["module"],
       orderBy: { module: "asc" },
