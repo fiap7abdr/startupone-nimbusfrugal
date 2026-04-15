@@ -29,6 +29,10 @@ shaping: true
 | R2.7 | Aceite de convite em `/invitations/[token]` com sign-out automático e flow de signup/login com callbackUrl | Must-have |
 | R2.8 | Excluir convite remove membro do tenant se já cadastrado | Must-have |
 | 🟡 R2.9 | Link de convite é rota pública; botão "Aceitar Convite" dispara Google OAuth direto; após autenticação usuário é levado a `/app/dashboard` do tenant convidado | Must-have |
+| 🟡 R2.10 | Se usuário logado tem email diferente do convite, página força logout antes de aceitar | Must-have |
+| 🟡 R2.11 | Se usuário logado tem email igual ao convite, página exibe Aceitar/Recusar sem relogar; Recusar marca convite como `declined` e grava audit | Must-have |
+| 🟡 R2.12 | Se o email convidado já é usuário da plataforma (mas não está logado), página exibe prompt "Você já tem conta" antes do OAuth | Must-have |
+| 🟡 R2.13 | Somente owner do tenant pode excluir convite (server-side + UI esconde botão) | Must-have |
 | **R3** | **AWS Organizations e Integrações** | Must-have |
 | R3.1 | Gerenciar múltiplas AWS Organizations (adicionar/editar/remover) em página única `/app/integrations` | Must-have |
 | R3.2 | CloudFormation gerado por integração (por conector, não por org inteira) | Must-have |
@@ -81,7 +85,7 @@ Shape A was selected and implemented in the bootstrap phase.
 | Part | Mechanism | Flag |
 |------|-----------|:----:|
 | 🟡 **A1** | **Auth & Access** — Auth.js v5 + Google OAuth (único provider), JWT strategy, PrismaAdapter. Middleware cookie-based (não importa auth.ts para manter middleware lean < 1MB). AdminUser table separada de User. Bootstrap `/nimbus-setup` usa Google OAuth. Rota `/admin/forbidden` (Route Handler) executa `signOut({ redirectTo: "/admin/login?error=forbidden" })`; `requireAdmin()` em `lib/tenant.ts` redireciona para ela quando user não é AdminUser ativo. | |
-| 🟡 **A2** | **Multi-tenancy** — Tenant model com slug único. TenantMember com targetGroup (owner/read). TenantInvitation com token e expiração. Server-side `requireTenant()` / `requireAdmin()` helpers. Delete invite cascade remove membro se já cadastrado. Invite flow: `/invitations/[token]` (público, sem proteção no middleware) exibe contexto do convite e botão "Aceitar Convite"; Server Action chama `signIn("google", { redirectTo: "/invitations/[token]/accept" })`. Route Handler `/accept` cria TenantMember, marca invitation `accepted`, grava audit, seta cookie `active-tenant-id` e redireciona a `/app/dashboard`. Route Handler `/logout` faz signOut quando usuário precisa trocar de conta. | |
+| 🟡 **A2** | **Multi-tenancy** — Tenant model com slug único. TenantMember com targetGroup (owner/read). TenantInvitation com token/status (pending/accepted/declined/revoked) e expiração. Server-side `requireTenant()` / `requireAdmin()` helpers. `deleteInvite` exige `tenant.ownerUserId === user.id`; UI esconde botão para não-owners. Invite flow em `/invitations/[token]` (público): (a) email logado ≠ convite → redirect `/logout`; (b) email logado = convite → UI inline Aceitar/Recusar; (c) não logado + email já usuário → prompt "Você já tem conta" + OAuth; (d) não logado + email novo → OAuth cria conta. Route Handlers: `/accept` cria TenantMember, marca `accepted`, seta cookie `active-tenant-id`, redireciona `/app/dashboard`; `/decline` marca `declined` + audit; `/logout` faz signOut. | |
 | **A3** | **AWS Organizations & Integrações** — Página única `/app/integrations` com CRUD de múltiplas AWS Organizations. Cada org lista seus 7 conectores com status, Role ARN, External ID. CloudFormation individual por conector via `buildConnectorCloudFormation()`. Registro de org cria 7 integrations via `createMany`. Remoção de org remove integrations em cascade. | |
 | **A4** | **Health check por conector** — Server Action por conector dentro do contexto da org. Valida Role ARN → ativa integração → cria IntegrationTestResult → descobre OUs/contas → upsert DataFreshnessStatus. | |
 | **A5** | **Dashboard & Visibilidade** — `/app/dashboard` com métricas consolidadas + freshness badges. `/app/organization` com árvore OUs/contas. `/app/recommendations` com lista priorizada. | |
@@ -120,6 +124,10 @@ Shape A was selected and implemented in the bootstrap phase.
 | R2.7 | Aceite de convite em `/invitations/[token]` com sign-out automático e flow de signup/login com callbackUrl | Must-have | ✅ |
 | R2.8 | Excluir convite remove membro do tenant se já cadastrado | Must-have | ✅ |
 | 🟡 R2.9 | Link de convite público + Google OAuth direto + redirect a `/app/dashboard` | Must-have | ✅ |
+| 🟡 R2.10 | Logout forçado quando email logado difere do convite | Must-have | ✅ |
+| 🟡 R2.11 | Aceitar/Recusar inline quando email logado bate com o convite | Must-have | ✅ |
+| 🟡 R2.12 | Prompt "Você já tem conta" quando email convidado já existe e não está logado | Must-have | ✅ |
+| 🟡 R2.13 | Apenas owner pode excluir convite | Must-have | ✅ |
 | R3.1 | Gerenciar múltiplas AWS Organizations (adicionar/editar/remover) em página única `/app/integrations` | Must-have | ✅ |
 | R3.2 | CloudFormation gerado por integração (por conector, não por org inteira) | Must-have | ✅ |
 | R3.3 | Trust policy referencia AWS Account ID da plataforma Nimbus | Must-have | ✅ |

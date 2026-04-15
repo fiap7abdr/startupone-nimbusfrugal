@@ -102,6 +102,9 @@
     "invite_used": "Este convite já foi aceito.",
     "accept_invite": "Aceitar convite",
     "invite_login_prompt": "Para aceitar este convite, faça login ou crie uma conta.",
+    "invite_already_member_prompt": "Você foi convidado. Deseja aceitar ou recusar o convite?",
+    "invite_existing_user_prompt": "Você já tem conta na plataforma. Faça login para aceitar o convite.",
+    "invite_decline": "Recusar",
     "invite_login": "Fazer login",
     "invite_signup": "Criar conta"
   },

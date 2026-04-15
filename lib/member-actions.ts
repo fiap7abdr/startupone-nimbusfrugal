@@ -158,6 +158,10 @@ export async function resendInvite(invitationId: string) {
 export async function deleteInvite(invitationId: string) {
   const { user, tenant } = await requireTenant();
 
+  if (tenant.ownerUserId !== user.id) {
+    throw new Error("Only the tenant owner can delete invitations.");
+  }
+
   const invitation = await prisma.tenantInvitation.findUnique({
     where: { id: invitationId },
   });

@@ -35,8 +35,10 @@ function isInCooldown(lastSentAt: string) {
 
 export function InvitationsTable({
   invitations,
+  isOwner,
 }: {
   invitations: Invitation[];
+  isOwner: boolean;
 }) {
   const t = useTranslations("users");
   const tc = useTranslations("common");
@@ -168,14 +170,16 @@ export function InvitationsTable({
                         )}
                       </Button>
                     )}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                      onClick={() => setDeletingId(inv.id)}
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
+                    {isOwner && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                        onClick={() => setDeletingId(inv.id)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
                   </div>
                 </td>
               </tr>

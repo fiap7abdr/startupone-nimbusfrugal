@@ -102,6 +102,9 @@
     "invite_used": "This invitation has already been accepted.",
     "accept_invite": "Accept invitation",
     "invite_login_prompt": "To accept this invitation, please log in or create an account.",
+    "invite_already_member_prompt": "You've been invited. Accept or decline the invitation?",
+    "invite_existing_user_prompt": "You already have an account on the platform. Log in to accept the invitation.",
+    "invite_decline": "Decline",
     "invite_login": "Log in",
     "invite_signup": "Create account"
   },

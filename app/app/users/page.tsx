@@ -186,7 +186,7 @@ export default async function UsersPage() {
             <CardTitle>{tc("recent_invites")}</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <InvitationsTable invitations={serializedInvitations} />
+            <InvitationsTable invitations={serializedInvitations} isOwner={isOwner} />
           </CardContent>
         </Card>
       )}
