@@ -12,12 +12,25 @@ import { prisma } from "@/lib/prisma";
 import { formatDate, connectorLabel } from "@/lib/utils";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { NavActionButton } from "@/components/app/nav-action-button";
 import { getTranslations } from "next-intl/server";
+import { Mail } from "lucide-react";
 
 export default async function DashboardPage() {
-  const { tenant } = await requireTenant();
+  const { tenant, user } = await requireTenant();
   const t = await getTranslations("dashboard");
   const tc = await getTranslations("common");
+
+  const pendingInvites = await prisma.tenantInvitation.findMany({
+    where: {
+      email: user.email,
+      status: "pending",
+      expiresAt: { gt: new Date() },
+      tenantId: { not: tenant.id },
+    },
+    include: { tenant: { select: { name: true } } },
+    orderBy: { createdAt: "desc" },
+  });
 
   const [
     integrations,
@@ -54,6 +67,54 @@ export default async function DashboardPage() {
         description={t("description")}
       />
 
+      {pendingInvites.length > 0 && (
+        <Card className="mb-6 border-primary/30 bg-accent/60">
+          <CardContent className="space-y-3 p-6">
+            <div className="flex items-center gap-2">
+              <Mail className="h-5 w-5 text-accent-foreground" />
+              <p className="text-base font-semibold text-accent-foreground">
+                {t("invites_title")}
+              </p>
+            </div>
+            <ul className="space-y-2">
+              {pendingInvites.map((inv) => (
+                <li
+                  key={inv.id}
+                  className="flex flex-col gap-3 rounded-md border border-border bg-card p-3 text-sm md:flex-row md:items-center md:justify-between"
+                >
+                  <div>
+                    <p>
+                      {t("invites_line")}{" "}
+                      <strong>{inv.tenant.name}</strong>{" "}
+                      {t("invites_as")}{" "}
+                      <strong>{inv.targetGroup}</strong>.
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {t("invites_expires")} {formatDate(inv.expiresAt)}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <NavActionButton
+                      href={`/invitations/${inv.token}/decline`}
+                      variant="outline"
+                      size="sm"
+                    >
+                      {t("invites_decline")}
+                    </NavActionButton>
+                    <NavActionButton
+                      href={`/invitations/${inv.token}/accept`}
+                      size="sm"
+                    >
+                      {t("invites_accept")}
+                    </NavActionButton>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
+
       {needsOnboarding && (
         <Card className="mb-8 border-primary/30 bg-accent/60">
           <CardContent className="flex flex-col items-start gap-4 p-6 md:flex-row md:items-center md:justify-between">
@@ -65,9 +126,9 @@ export default async function DashboardPage() {
                 {t("onboarding_desc")}
               </p>
             </div>
-            <Button asChild>
-              <Link href="/app/integrations">{t("onboarding_cta")}</Link>
-            </Button>
+            <NavActionButton href="/app/integrations">
+              {t("onboarding_cta")}
+            </NavActionButton>
           </CardContent>
         </Card>
       )}

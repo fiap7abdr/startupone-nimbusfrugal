@@ -57,9 +57,9 @@ export default async function LandingPage() {
                   trigger={
                     <Button
                       size="lg"
-                      className="bg-[#34D399] text-white hover:bg-[#2CC085] shadow-lg"
+                      className="bg-[#34D399] text-white hover:bg-[#2CC085] shadow-lg relative overflow-hidden before:absolute before:inset-0 before:rounded-[inherit] before:bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.7)_50%,transparent_75%,transparent_100%)] before:bg-[length:250%_250%,100%_100%] before:bg-[position:200%_0,0_0] before:bg-no-repeat before:transition-[background-position_0s_ease] before:duration-1000 hover:before:bg-[position:-100%_0,0_0] dark:before:bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.5)_50%,transparent_75%,transparent_100%)] cursor-pointer"
                     >
-                      {t("hero_cta")}
+                      <span className="relative z-10">{t("hero_cta")}</span>
                     </Button>
                   }
                 />
@@ -305,9 +305,9 @@ export default async function LandingPage() {
                     trigger={
                       <Button
                         variant="outline"
-                        className="mt-6 w-full border-[#34D399] text-[#34D399] hover:bg-[#34D399]/10"
+                        className="mt-6 w-full border-[#34D399] text-[#34D399] hover:bg-[#34D399]/10 relative overflow-hidden before:absolute before:inset-0 before:rounded-[inherit] before:bg-[linear-gradient(45deg,transparent_25%,rgba(52,211,153,0.35)_50%,transparent_75%,transparent_100%)] before:bg-[length:250%_250%,100%_100%] before:bg-[position:200%_0,0_0] before:bg-no-repeat before:transition-[background-position_0s_ease] before:duration-1000 hover:before:bg-[position:-100%_0,0_0] cursor-pointer"
                       >
-                        {t("pro_cta")}
+                        <span className="relative z-10">{t("pro_cta")}</span>
                       </Button>
                     }
                   />
@@ -340,9 +340,9 @@ export default async function LandingPage() {
               trigger={
                 <Button
                   size="lg"
-                  className="mt-8 bg-[#34D399] text-white hover:bg-[#2CC085] shadow-lg"
+                  className="mt-8 bg-[#34D399] text-white hover:bg-[#2CC085] shadow-lg relative overflow-hidden before:absolute before:inset-0 before:rounded-[inherit] before:bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.7)_50%,transparent_75%,transparent_100%)] before:bg-[length:250%_250%,100%_100%] before:bg-[position:200%_0,0_0] before:bg-no-repeat before:transition-[background-position_0s_ease] before:duration-1000 hover:before:bg-[position:-100%_0,0_0] dark:before:bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.5)_50%,transparent_75%,transparent_100%)] cursor-pointer"
                 >
-                  {t("final_cta_button")}
+                  <span className="relative z-10">{t("final_cta_button")}</span>
                 </Button>
               }
             />

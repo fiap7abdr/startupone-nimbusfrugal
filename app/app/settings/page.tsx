@@ -79,7 +79,9 @@ export default async function SettingsPage({
               }
             />
             <Row label={tc("status")} value={billing?.billingStatus ?? "—"} />
-            <Row label={t("trial_expires")} value={formatDate(billing?.trialEndsAt)} />
+            {billing?.plan !== "PRO" && (
+              <Row label={t("trial_expires")} value={formatDate(billing?.trialEndsAt)} />
+            )}
           </CardContent>
         </Card>
 

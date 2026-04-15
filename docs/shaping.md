@@ -11,8 +11,8 @@ shaping: true
 | **R0** | Plataforma FinOps SaaS multi-tenant com onboarding self-service para AWS | Core goal |
 | **R1** | **Autenticação e acesso** | Must-have |
 | R1.1 | Google OAuth como único provider de autenticação | Must-have |
-| R1.2 | 3 perfis: Admin Geral, Owner do Tenant, Read | Must-have |
-| R1.3 | Bootstrap one-shot via Google OAuth para criar primeiro Admin Geral (`/nimbus-setup`) | Must-have |
+| 🟡 R1.2 | 3 perfis: Admin Global, Owner do Tenant, Read | Must-have |
+| 🟡 R1.3 | Bootstrap one-shot via Google OAuth para criar primeiro Admin Global (`/nimbus-setup`) | Must-have |
 | R1.4 | Middleware protege rotas `/app/*` e `/admin/*` (exceto `/admin/login`) | Must-have |
 | R1.5 | Signup cria apenas User (sem tenant); tenant criado em etapa separada | Must-have |
 | 🟡 R1.6 | Tentativa de acesso a `/admin/*` por não-admin encerra a sessão (signOut) e redireciona a `/admin/login?error=forbidden` | Must-have |
@@ -33,6 +33,7 @@ shaping: true
 | 🟡 R2.11 | Se usuário logado tem email igual ao convite, página exibe Aceitar/Recusar sem relogar; Recusar marca convite como `declined` e grava audit | Must-have |
 | 🟡 R2.12 | Se o email convidado já é usuário da plataforma (mas não está logado), página exibe prompt "Você já tem conta" antes do OAuth | Must-have |
 | 🟡 R2.13 | Somente owner do tenant pode excluir convite (server-side + UI esconde botão) | Must-have |
+| 🟡 R2.14 | Dashboard do tenant exibe convites pendentes para outros tenants do usuário logado (com Aceitar/Recusar inline) | Must-have |
 | **R3** | **AWS Organizations e Integrações** | Must-have |
 | R3.1 | Gerenciar múltiplas AWS Organizations (adicionar/editar/remover) em página única `/app/integrations` | Must-have |
 | R3.2 | CloudFormation gerado por integração (por conector, não por org inteira) | Must-have |
@@ -88,7 +89,7 @@ Shape A was selected and implemented in the bootstrap phase.
 | 🟡 **A2** | **Multi-tenancy** — Tenant model com slug único. TenantMember com targetGroup (owner/read). TenantInvitation com token/status (pending/accepted/declined/revoked) e expiração. Server-side `requireTenant()` / `requireAdmin()` helpers. `deleteInvite` exige `tenant.ownerUserId === user.id`; UI esconde botão para não-owners. Invite flow em `/invitations/[token]` (público): (a) email logado ≠ convite → redirect `/logout`; (b) email logado = convite → UI inline Aceitar/Recusar; (c) não logado + email já usuário → prompt "Você já tem conta" + OAuth; (d) não logado + email novo → OAuth cria conta. Route Handlers: `/accept` cria TenantMember, marca `accepted`, seta cookie `active-tenant-id`, redireciona `/app/dashboard`; `/decline` marca `declined` + audit; `/logout` faz signOut. | |
 | **A3** | **AWS Organizations & Integrações** — Página única `/app/integrations` com CRUD de múltiplas AWS Organizations. Cada org lista seus 7 conectores com status, Role ARN, External ID. CloudFormation individual por conector via `buildConnectorCloudFormation()`. Registro de org cria 7 integrations via `createMany`. Remoção de org remove integrations em cascade. | |
 | **A4** | **Health check por conector** — Server Action por conector dentro do contexto da org. Valida Role ARN → ativa integração → cria IntegrationTestResult → descobre OUs/contas → upsert DataFreshnessStatus. | |
-| **A5** | **Dashboard & Visibilidade** — `/app/dashboard` com métricas consolidadas + freshness badges. `/app/organization` com árvore OUs/contas. `/app/recommendations` com lista priorizada. | |
+| 🟡 **A5** | **Dashboard & Visibilidade** — `/app/dashboard` com métricas consolidadas + freshness badges. Query extra `TenantInvitation.findMany({ email: user.email, status: "pending", expiresAt > now, tenantId != tenant.id })` renderiza card de convites pendentes com links diretos a `/invitations/[token]/accept` e `/decline`. `/app/organization` com árvore OUs/contas. `/app/recommendations` com lista priorizada. | |
 | **A6** | **Admin Panel** — Route group `(protected)` com layout que chama `requireAdmin()`. Páginas: overview, tenants, integrations, batches, admin-users, users (com delete cascade), audit (global com filtros). `/admin/login` fora do group. | |
 | **A7** | **Billing** — BillingSubscription criada no signup (TRIAL, 90 dias). Upgrade para PRO com consentimento. Job mensal que soma estimated savings das recomendações e cobra 10%. | ⚠️ |
 | **A8** | **Coleta de Dados** — CollectionBatch model com scheduling. DataFreshnessStatus por conector por tenant. Cron job placeholder (não implementado real). | ⚠️ |
@@ -107,8 +108,8 @@ Shape A was selected and implemented in the bootstrap phase.
 |-----|-------------|--------|---|
 | R0 | Plataforma FinOps SaaS multi-tenant com onboarding self-service para AWS | Core goal | ✅ |
 | R1.1 | Google OAuth como único provider de autenticação | Must-have | ✅ |
-| R1.2 | 3 perfis: Admin Geral, Owner do Tenant, Read | Must-have | ✅ |
-| R1.3 | Bootstrap one-shot via Google OAuth para criar primeiro Admin Geral (`/nimbus-setup`) | Must-have | ✅ |
+| 🟡 R1.2 | 3 perfis: Admin Global, Owner do Tenant, Read | Must-have | ✅ |
+| 🟡 R1.3 | Bootstrap one-shot via Google OAuth para criar primeiro Admin Global (`/nimbus-setup`) | Must-have | ✅ |
 | R1.4 | Middleware protege rotas `/app/*` e `/admin/*` (exceto `/admin/login`) | Must-have | ✅ |
 | R1.5 | Signup cria apenas User (sem tenant); tenant criado em etapa separada | Must-have | ✅ |
 | 🟡 R1.6 | Acesso admin por não-admin encerra sessão e redireciona a `/admin/login?error=forbidden` | Must-have | ✅ |
@@ -128,6 +129,7 @@ Shape A was selected and implemented in the bootstrap phase.
 | 🟡 R2.11 | Aceitar/Recusar inline quando email logado bate com o convite | Must-have | ✅ |
 | 🟡 R2.12 | Prompt "Você já tem conta" quando email convidado já existe e não está logado | Must-have | ✅ |
 | 🟡 R2.13 | Apenas owner pode excluir convite | Must-have | ✅ |
+| 🟡 R2.14 | Dashboard mostra convites pendentes para outros tenants | Must-have | ✅ |
 | R3.1 | Gerenciar múltiplas AWS Organizations (adicionar/editar/remover) em página única `/app/integrations` | Must-have | ✅ |
 | R3.2 | CloudFormation gerado por integração (por conector, não por org inteira) | Must-have | ✅ |
 | R3.3 | Trust policy referencia AWS Account ID da plataforma Nimbus | Must-have | ✅ |
@@ -191,6 +193,7 @@ Shape A was selected and implemented in the bootstrap phase.
 - 🟡 Guard anti-duplo-clique global: `SubmitButton` reutilizável + `useTransition` em tabelas client (members, invitations, admin users)
 - 🟡 Invite flow refatorado: `/invitations/[token]` público + Route Handlers `/accept` e `/logout`, OAuth direto, redirect final a `/app/dashboard`
 - 🟡 Sidebar (app e admin) exibe usuário logado no topo (nome/email)
+- 🟡 Dashboard exibe convites pendentes de outros tenants com Aceitar/Recusar inline
 - i18n: pt-BR e en completos para todos os módulos
 
 ### Pending (Next Phases)

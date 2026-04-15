@@ -1,5 +1,4 @@
 import { notFound, redirect } from "next/navigation";
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { auth, signIn } from "@/auth";
 import { prisma } from "@/lib/prisma";
@@ -10,8 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { NavActionButton } from "@/components/app/nav-action-button";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
 import { Users } from "lucide-react";
@@ -88,16 +87,21 @@ export default async function InvitationPage({
                     {t("invite_already_member_prompt")}
                   </p>
                   <div className="flex gap-2">
-                    <Button asChild variant="outline" className="flex-1" size="lg">
-                      <Link href={`/invitations/${token}/decline`}>
-                        {t("invite_decline")}
-                      </Link>
-                    </Button>
-                    <Button asChild className="flex-1" size="lg">
-                      <Link href={`/invitations/${token}/accept`}>
-                        {t("accept_invite")}
-                      </Link>
-                    </Button>
+                    <NavActionButton
+                      href={`/invitations/${token}/decline`}
+                      variant="outline"
+                      size="lg"
+                      className="flex-1"
+                    >
+                      {t("invite_decline")}
+                    </NavActionButton>
+                    <NavActionButton
+                      href={`/invitations/${token}/accept`}
+                      size="lg"
+                      className="flex-1"
+                    >
+                      {t("accept_invite")}
+                    </NavActionButton>
                   </div>
                 </div>
               ) : existingUser ? (

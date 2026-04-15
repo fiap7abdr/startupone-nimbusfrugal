@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { createAuditLog } from "@/lib/audit";
@@ -68,5 +69,6 @@ export async function GET(
     maxAge: 60 * 60 * 24 * 365,
   });
 
+  revalidatePath("/app", "layout");
   redirect("/app/dashboard");
 }

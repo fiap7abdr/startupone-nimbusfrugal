@@ -6,26 +6,34 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 import { requireTenant } from "@/lib/tenant";
 import { getTranslations } from "next-intl/server";
 import { DemoBadge } from "@/components/app/demo-badge";
 import { generateRecommendations } from "@/lib/demo/generators";
+import { RecommendationsTable } from "./recommendations-table";
 
 export default async function RecommendationsPage() {
   const { tenant } = await requireTenant();
-  const [t, tc] = await Promise.all([
-    getTranslations("recommendations"),
-    getTranslations("common"),
-  ]);
-  const recs = tenant.demoMode
+  const t = await getTranslations("recommendations");
+  const rawRecs = tenant.demoMode
     ? generateRecommendations()
     : await prisma.recommendation.findMany({
         where: { tenantId: tenant.id },
         orderBy: [{ priority: "desc" }, { createdAt: "desc" }],
         take: 100,
       });
+
+  const recs = rawRecs.map((r) => ({
+    id: r.id,
+    recommendationType: r.recommendationType,
+    source: r.source,
+    awsAccountId: r.awsAccountId ?? null,
+    priority: r.priority,
+    estimatedSavings:
+      r.estimatedSavings != null ? Number(r.estimatedSavings) : null,
+    status: r.status,
+  }));
 
   return (
     <div>
@@ -46,42 +54,7 @@ export default async function RecommendationsPage() {
       ) : (
         <Card>
           <CardContent className="p-0">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
-                <tr>
-                  <th className="px-4 py-3 text-left">{t("col_type")}</th>
-                  <th className="px-4 py-3 text-left">{t("col_source")}</th>
-                  <th className="px-4 py-3 text-left">{t("col_account")}</th>
-                  <th className="px-4 py-3 text-left">{t("col_priority")}</th>
-                  <th className="px-4 py-3 text-right">{t("col_savings")}</th>
-                  <th className="px-4 py-3 text-left">{tc("status")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recs.map((r) => (
-                  <tr key={r.id} className="border-t border-border">
-                    <td className="px-4 py-3 font-medium">{r.recommendationType}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{r.source}</td>
-                    <td className="px-4 py-3 font-mono text-xs">
-                      {r.awsAccountId ?? "—"}
-                    </td>
-                    <td className="px-4 py-3">
-                      <Badge variant={r.priority === "high" ? "negative" : "muted"}>
-                        {r.priority}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-3 text-right font-medium">
-                      {r.estimatedSavings
-                        ? `US$ ${Number(r.estimatedSavings).toFixed(2)}`
-                        : "—"}
-                    </td>
-                    <td className="px-4 py-3">
-                      <Badge variant="outline">{r.status}</Badge>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <RecommendationsTable recs={recs} />
           </CardContent>
         </Card>
       )}
