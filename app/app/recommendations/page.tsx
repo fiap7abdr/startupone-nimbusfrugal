@@ -10,6 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 import { requireTenant } from "@/lib/tenant";
 import { getTranslations } from "next-intl/server";
+import { DemoBadge } from "@/components/app/demo-badge";
+import { generateRecommendations } from "@/lib/demo/generators";
 
 export default async function RecommendationsPage() {
   const { tenant } = await requireTenant();
@@ -17,17 +19,20 @@ export default async function RecommendationsPage() {
     getTranslations("recommendations"),
     getTranslations("common"),
   ]);
-  const recs = await prisma.recommendation.findMany({
-    where: { tenantId: tenant.id },
-    orderBy: [{ priority: "desc" }, { createdAt: "desc" }],
-    take: 100,
-  });
+  const recs = tenant.demoMode
+    ? generateRecommendations()
+    : await prisma.recommendation.findMany({
+        where: { tenantId: tenant.id },
+        orderBy: [{ priority: "desc" }, { createdAt: "desc" }],
+        take: 100,
+      });
 
   return (
     <div>
       <PageHeader
         title={t("title")}
         description={t("description")}
+        action={tenant.demoMode ? <DemoBadge /> : undefined}
       />
       {recs.length === 0 ? (
         <Card>

@@ -1,7 +1,7 @@
 import { PageHeader } from "@/components/app/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { prisma } from "@/lib/prisma";
@@ -99,9 +99,9 @@ export default async function AdminUsersPage() {
                 <Label htmlFor="email">{tc("email")}</Label>
                 <Input id="email" name="email" type="email" required />
               </div>
-              <Button type="submit" className="w-full">
+              <SubmitButton className="w-full" pendingText={tc("sending_invite")}>
                 {tc("send_invite")}
-              </Button>
+              </SubmitButton>
             </form>
           </CardContent>
         </Card>

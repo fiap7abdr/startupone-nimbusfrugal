@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
@@ -38,13 +38,16 @@ export function UsersTable({ users }: { users: UserRow[] }) {
   const tc = useTranslations("common");
   const router = useRouter();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
 
   const userToDelete = users.find((u) => u.id === deletingId);
 
-  async function handleDelete(userId: string) {
-    await deleteUser(userId);
-    setDeletingId(null);
-    router.refresh();
+  function handleDelete(userId: string) {
+    startTransition(async () => {
+      await deleteUser(userId);
+      setDeletingId(null);
+      router.refresh();
+    });
   }
 
   function formatDate(dateStr: string) {
@@ -147,9 +150,10 @@ export function UsersTable({ users }: { users: UserRow[] }) {
             </DialogClose>
             <Button
               variant="destructive"
+              disabled={pending}
               onClick={() => deletingId && handleDelete(deletingId)}
             >
-              {t("delete_user")}
+              {pending ? tc("loading") : t("delete_user")}
             </Button>
           </div>
         </DialogContent>

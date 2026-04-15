@@ -38,6 +38,6 @@ export async function requireAdmin() {
   const admin = await prisma.adminUser.findUnique({
     where: { email: user.email },
   });
-  if (!admin || admin.status !== "active") redirect("/admin/login");
+  if (!admin || admin.status !== "active") redirect("/admin/forbidden");
   return { user, admin };
 }

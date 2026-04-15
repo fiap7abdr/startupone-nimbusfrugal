@@ -33,12 +33,16 @@ export function AppSidebar({
   activeTenantId,
   plan,
   trialEndsAt,
+  userName,
+  userEmail,
 }: {
   tenantName: string;
   tenants?: TenantOption[];
   activeTenantId?: string;
   plan: string;
   trialEndsAt: string | null;
+  userName?: string | null;
+  userEmail: string;
 }) {
   const t = useTranslations("sidebar");
   const pathname = usePathname();
@@ -106,7 +110,9 @@ export function AppSidebar({
             className="hidden shrink-0 group-hover/sidebar:block"
           />
           <div className="hidden min-w-0 flex-1 group-hover/sidebar:block">
-            <p className="text-sm font-semibold">Nimbus Frugal</p>
+            <p className="truncate text-sm font-semibold" title={userEmail}>
+              {userName ?? userEmail}
+            </p>
             {tenants && activeTenantId ? (
               <TenantSwitcher
                 tenants={tenants}

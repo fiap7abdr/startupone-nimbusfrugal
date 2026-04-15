@@ -245,7 +245,19 @@
     "billing_desc": "Plan and billing model.",
     "billing_model": "10% of realized savings",
     "trial_free": "Free trial",
-    "trial_expires": "Trial expires on"
+    "trial_expires": "Trial expires on",
+    "demo_title": "Demo mode",
+    "demo_desc": "Populate AWS Integrations, Organization and Recommendations pages with simulated data. Mutations are disabled while enabled.",
+    "demo_on": "Enabled",
+    "demo_off": "Disabled",
+    "demo_enable": "Enable demo mode",
+    "demo_disable": "Disable demo mode",
+    "demo_updating": "Updating...",
+    "demo_badge": "Demo mode",
+    "welcome_title": "Welcome! Want to explore with demo data?",
+    "welcome_desc": "Demo mode fills AWS Integrations, Organization and Recommendations with simulated data so you can explore Nimbus Frugal without connecting a real AWS account. Mutations are disabled while on, and you can toggle it off anytime here.",
+    "welcome_enable": "Enable demo mode",
+    "welcome_skip": "Not now"
   },
   "tenants": {
     "title": "Tenants",
@@ -391,6 +403,7 @@
     "filter_to": "To",
     "filter_all": "All",
     "filter_apply": "Filter",
+    "filter_applying": "Filtering...",
     "filter_clear": "Clear",
     "showing": "Showing",
     "of": "of",

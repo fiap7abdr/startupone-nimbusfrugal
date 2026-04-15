@@ -2,7 +2,7 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { getTranslations } from "next-intl/server";
-import { Button } from "@/components/ui/button";
+import { SubmitButton as UiSubmitButton } from "@/components/ui/submit-button";
 import {
   Card,
   CardContent,
@@ -87,7 +87,7 @@ async function createTenant(formData: FormData) {
     maxAge: 60 * 60 * 24 * 365,
   });
 
-  redirect("/app/integrations");
+  redirect("/app/settings?welcome=1");
 }
 
 export default async function NewTenantPage({
@@ -139,9 +139,9 @@ export default async function NewTenantPage({
             />
           </form>
           <form action={logout} className="mt-3">
-            <Button type="submit" variant="ghost" className="w-full" size="sm">
+            <UiSubmitButton variant="ghost" className="w-full" size="sm" pendingText={t("logout")}>
               {t("logout")}
-            </Button>
+            </UiSubmitButton>
           </form>
         </CardContent>
       </Card>

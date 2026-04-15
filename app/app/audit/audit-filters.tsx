@@ -1,5 +1,6 @@
 "use client";
 
+import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ interface TenantAuditFiltersProps {
 export function TenantAuditFilters({ modules, currentFilters }: TenantAuditFiltersProps) {
   const t = useTranslations("audit");
   const router = useRouter();
+  const [pending, startTransition] = useTransition();
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -30,11 +32,11 @@ export function TenantAuditFilters({ modules, currentFilters }: TenantAuditFilte
       if (value) sp.set(key, String(value));
     }
     const qs = sp.toString();
-    router.push(`/app/audit${qs ? `?${qs}` : ""}`);
+    startTransition(() => router.push(`/app/audit${qs ? `?${qs}` : ""}`));
   }
 
   function handleClear() {
-    router.push("/app/audit");
+    startTransition(() => router.push("/app/audit"));
   }
 
   return (
@@ -97,8 +99,10 @@ export function TenantAuditFilters({ modules, currentFilters }: TenantAuditFilte
           </div>
 
           <div className="flex items-end gap-2">
-            <Button type="submit" size="sm">{t("filter_apply")}</Button>
-            <Button type="button" variant="outline" size="sm" onClick={handleClear}>
+            <Button type="submit" size="sm" disabled={pending}>
+              {pending ? t("filter_applying") : t("filter_apply")}
+            </Button>
+            <Button type="button" variant="outline" size="sm" disabled={pending} onClick={handleClear}>
               {t("filter_clear")}
             </Button>
           </div>

@@ -6,6 +6,7 @@ import { registerOrgSchema, roleArnSchema } from "@/lib/validations";
 import { randomExternalId } from "@/lib/utils";
 import { CONNECTOR_TYPES } from "@/lib/aws-cloudformation";
 import { createAuditLog } from "@/lib/audit";
+import { assertNotDemo } from "@/lib/demo/guard";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -14,6 +15,7 @@ const PAGE_PATH = "/app/integrations";
 
 export async function addOrganization(formData: FormData) {
   const { tenant, user } = await requireTenant();
+  assertNotDemo(tenant.demoMode);
   const parsed = registerOrgSchema.safeParse({
     organizationName: formData.get("organizationName"),
     organizationId: formData.get("organizationId"),
@@ -66,6 +68,7 @@ export async function addOrganization(formData: FormData) {
 
 export async function updateOrganization(formData: FormData) {
   const { tenant, user } = await requireTenant();
+  assertNotDemo(tenant.demoMode);
   const orgId = String(formData.get("orgId") ?? "");
   const parsed = registerOrgSchema.safeParse({
     organizationName: formData.get("organizationName"),
@@ -104,6 +107,7 @@ export async function updateOrganization(formData: FormData) {
 
 export async function removeOrganization(formData: FormData) {
   const { tenant, user } = await requireTenant();
+  assertNotDemo(tenant.demoMode);
   const orgId = String(formData.get("orgId") ?? "");
   if (!orgId) return;
 
@@ -133,6 +137,7 @@ export async function removeOrganization(formData: FormData) {
 
 export async function saveRoleArn(formData: FormData) {
   const { tenant, user } = await requireTenant();
+  assertNotDemo(tenant.demoMode);
   const parsed = roleArnSchema.safeParse({
     integrationId: formData.get("integrationId"),
     roleArn: formData.get("roleArn"),
@@ -171,6 +176,7 @@ export async function saveRoleArn(formData: FormData) {
 
 export async function runHealthCheck(formData: FormData) {
   const { tenant } = await requireTenant();
+  assertNotDemo(tenant.demoMode);
   const integrationId = String(formData.get("integrationId") ?? "");
   const integration = await prisma.integration.findFirst({
     where: { id: integrationId, tenantId: tenant.id },

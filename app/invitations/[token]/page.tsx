@@ -1,9 +1,7 @@
 import { notFound, redirect } from "next/navigation";
-import { cookies } from "next/headers";
 import { getTranslations } from "next-intl/server";
-import { auth, signOut } from "@/auth";
+import { auth, signIn } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,79 +9,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
 import { Users } from "lucide-react";
-import Link from "next/link";
-import { createAuditLog } from "@/lib/audit";
-
-async function acceptInvitation(token: string, userEmail: string) {
-  const invitation = await prisma.tenantInvitation.findUnique({
-    where: { token },
-    include: { tenant: true },
-  });
-  if (!invitation || invitation.status !== "pending") {
-    redirect("/app");
-  }
-  if (invitation.expiresAt < new Date()) {
-    redirect("/app");
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { email: userEmail },
-  });
-  if (!user) redirect("/login");
-
-  const existingMembership = await prisma.tenantMember.findUnique({
-    where: { tenantId_userId: { tenantId: invitation.tenantId, userId: user.id } },
-  });
-
-  if (!existingMembership) {
-    await prisma.tenantMember.create({
-      data: {
-        tenantId: invitation.tenantId,
-        userId: user.id,
-        targetGroup: invitation.targetGroup,
-        membershipStatus: "active",
-      },
-    });
-  }
-
-  await prisma.tenantInvitation.update({
-    where: { id: invitation.id },
-    data: { status: "accepted", acceptedAt: new Date() },
-  });
-
-  await createAuditLog({
-    tenantId: invitation.tenantId,
-    entityType: "tenant_invitation",
-    entityId: invitation.id,
-    action: "invitation.accepted",
-    actor: user.id,
-    actorEmail: user.email,
-    module: "invitations",
-    summary: `Aceitou convite para ${invitation.tenant.name}`,
-    after: { email: userEmail, targetGroup: invitation.targetGroup },
-  });
-
-  const cookieStore = await cookies();
-  cookieStore.set("active-tenant-id", invitation.tenantId, {
-    path: "/",
-    httpOnly: true,
-    sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 365,
-  });
-}
 
 export default async function InvitationPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ token: string }>;
-  searchParams: Promise<{ flow?: string }>;
 }) {
   const { token } = await params;
-  const { flow } = await searchParams;
 
   const invitation = await prisma.tenantInvitation.findUnique({
     where: { token },
@@ -98,20 +34,17 @@ export default async function InvitationPage({
   const session = await auth();
   const isLoggedIn = !!session?.user?.email;
 
-  // Logged in + flow=accept → user just came back from signup/login, auto-accept
-  if (isLoggedIn && flow === "accept" && !expired && !alreadyAccepted) {
-    await acceptInvitation(token, session.user!.email!);
-    redirect("/app/dashboard");
-  }
-
-  // Logged in without flow=accept → sign out and redirect back (force signup flow)
+  // Logged in + convite válido → aceitar direto
   if (isLoggedIn && !expired && !alreadyAccepted) {
-    await signOut({ redirect: false });
-    redirect(`/invitations/${token}`);
+    redirect(`/invitations/${token}/accept`);
   }
 
   const t = await getTranslations("auth");
-  const callbackUrl = `/invitations/${token}?flow=accept`;
+
+  async function loginAndAccept() {
+    "use server";
+    await signIn("google", { redirectTo: `/invitations/${token}/accept` });
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -144,18 +77,17 @@ export default async function InvitationPage({
                   <p className="text-sm text-muted-foreground">
                     {t("invite_login_prompt")}
                   </p>
-                  <div className="flex flex-col gap-2">
-                    <Button asChild className="w-full" size="lg">
-                      <Link href={`/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
-                        {t("invite_signup")}
-                      </Link>
-                    </Button>
-                    <Button asChild variant="outline" className="w-full" size="lg">
-                      <Link href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
-                        {t("invite_login")}
-                      </Link>
-                    </Button>
-                  </div>
+                  <form action={loginAndAccept}>
+                    <SubmitButton variant="outline" className="w-full" size="lg" pendingText={t("accept_invite")}>
+                      <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+                      </svg>
+                      {t("accept_invite")}
+                    </SubmitButton>
+                  </form>
                 </div>
               )}
             </CardContent>

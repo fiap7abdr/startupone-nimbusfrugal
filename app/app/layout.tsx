@@ -8,7 +8,7 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { tenant, memberships } = await requireTenant();
+  const { tenant, memberships, user } = await requireTenant();
 
   const cookieStore = await cookies();
   const activeTenantId = cookieStore.get("active-tenant-id")?.value ?? tenant.id;
@@ -30,6 +30,8 @@ export default async function AppLayout({
         activeTenantId={activeTenantId}
         plan={plan}
         trialEndsAt={trialEndsAt}
+        userName={user.name}
+        userEmail={user.email}
       />
       <div className="flex-1 overflow-auto">
         <main className="mx-auto max-w-6xl p-8">{children}</main>

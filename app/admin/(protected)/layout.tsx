@@ -10,7 +10,7 @@ export default async function ProtectedAdminLayout({
   const { admin } = await requireAdmin();
   return (
     <div className="flex min-h-screen bg-background">
-      <AdminSidebar adminEmail={admin.email} />
+      <AdminSidebar adminEmail={admin.email} adminName={admin.name} />
       <div className="flex-1 overflow-auto">
         <main className="mx-auto max-w-6xl p-8">{children}</main>
       </div>

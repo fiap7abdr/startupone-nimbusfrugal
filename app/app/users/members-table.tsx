@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
@@ -39,18 +39,23 @@ export function MembersTable({
   const tc = useTranslations("common");
   const router = useRouter();
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
   const memberToRemove = members.find((m) => m.id === removingId);
 
-  async function handleRemove(memberId: string) {
-    await removeMember(memberId);
-    setRemovingId(null);
-    router.refresh();
+  function handleRemove(memberId: string) {
+    startTransition(async () => {
+      await removeMember(memberId);
+      setRemovingId(null);
+      router.refresh();
+    });
   }
 
-  async function handleChangeRole(memberId: string, currentRole: string) {
+  function handleChangeRole(memberId: string, currentRole: string) {
     const newRole = currentRole === "owner" ? "read" : "owner";
-    await changeMemberRole(memberId, newRole);
-    router.refresh();
+    startTransition(async () => {
+      await changeMemberRole(memberId, newRole);
+      router.refresh();
+    });
   }
 
   function formatDate(dateStr: string) {
@@ -104,6 +109,7 @@ export function MembersTable({
                           variant="ghost"
                           size="sm"
                           title={t("change_role")}
+                          disabled={pending}
                           onClick={() => handleChangeRole(m.id, m.targetGroup)}
                         >
                           <ArrowRightLeft className="h-3.5 w-3.5" />
@@ -113,6 +119,7 @@ export function MembersTable({
                           size="sm"
                           title={t("remove_member")}
                           className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          disabled={pending}
                           onClick={() => setRemovingId(m.id)}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
@@ -148,9 +155,10 @@ export function MembersTable({
             </DialogClose>
             <Button
               variant="destructive"
+              disabled={pending}
               onClick={() => removingId && handleRemove(removingId)}
             >
-              {t("remove_member")}
+              {pending ? tc("loading") : t("remove_member")}
             </Button>
           </div>
         </DialogContent>

@@ -15,6 +15,8 @@ import {
   Crown,
 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { DemoBadge } from "@/components/app/demo-badge";
+import { generateOrganizationsWithTree } from "@/lib/demo/generators";
 
 interface OUNode {
   id: string;
@@ -81,20 +83,23 @@ export default async function OrganizationPage() {
   const { tenant } = await requireTenant();
   const t = await getTranslations("organization");
 
-  const organizations = await prisma.awsOrganization.findMany({
-    where: { tenantId: tenant.id },
-    orderBy: { createdAt: "asc" },
-    include: {
-      ous: { orderBy: { name: "asc" } },
-      accounts: { orderBy: { accountName: "asc" } },
-    },
-  });
+  const organizations = tenant.demoMode
+    ? generateOrganizationsWithTree()
+    : await prisma.awsOrganization.findMany({
+        where: { tenantId: tenant.id },
+        orderBy: { createdAt: "asc" },
+        include: {
+          ous: { orderBy: { name: "asc" } },
+          accounts: { orderBy: { accountName: "asc" } },
+        },
+      });
 
   return (
     <div>
       <PageHeader
         title={t("title")}
         description={t("description")}
+        action={tenant.demoMode ? <DemoBadge /> : undefined}
       />
 
       {organizations.length === 0 ? (

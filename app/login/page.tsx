@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 import {
   Card,
   CardContent,
@@ -41,7 +41,7 @@ export default async function LoginPage({
             <CardContent>
               <form action={loginWithGoogle}>
                 {callbackUrl && <input type="hidden" name="redirectTo" value={callbackUrl} />}
-                <Button type="submit" variant="outline" className="w-full">
+                <SubmitButton variant="outline" className="w-full" pendingText={t("login_google")}>
                   <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                     <path
                       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
@@ -61,7 +61,7 @@ export default async function LoginPage({
                     />
                   </svg>
                   {t("login_google")}
-                </Button>
+                </SubmitButton>
               </form>
             </CardContent>
           </Card>

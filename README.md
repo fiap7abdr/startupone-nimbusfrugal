@@ -38,9 +38,12 @@ Plataforma FinOps SaaS multi-tenant para AWS com atualizacao diaria e foco em vi
 - `/app/organization` — arvore OUs/contas descoberta
 - `/app/recommendations` — oportunidades priorizadas
 - `/app/users` — membros, convites, grupos owner/read
+- `/app/audit` — trilha de auditoria do tenant (inclui eventos de auth dos membros)
 - `/app/settings` — billing e preferencias
 - `/app/tenants` — gerenciar tenants (criar, alternar, excluir) — somente Pro
 - `/app/upgrade` — upgrade de plano Trial → Pro com consentimento
+- `/invitations/[token]` — aceite de convite via Google OAuth (sign-out + `?flow=accept`)
+- `/new-tenant` — criacao do primeiro tenant pos-signup (submit com anti-duplo-clique + botao de logout)
 
 ### Admin Global
 - `/admin` — overview
@@ -48,6 +51,8 @@ Plataforma FinOps SaaS multi-tenant para AWS com atualizacao diaria e foco em vi
 - `/admin/integrations` — integracoes globais
 - `/admin/batches` — batches de coleta
 - `/admin/admin-users` — gestao de admins
+- `/admin/users` — gestao de todos os usuarios (delete cascade)
+- `/admin/audit` — trilha de auditoria global com filtros (modulo, ator, tipo, acao, tenant, periodo) e paginacao
 
 ## Entidades (Prisma)
 
@@ -163,10 +168,25 @@ A rota `/nimbus-setup` e o ponto de entrada inicial da plataforma — uso unico.
 - Dados nao sao real-time — freshness sempre exibido
 - Middleware Edge < 1MB (nao importa auth.ts, checa cookie direto)
 
+## Auditoria
+
+Audit log centralizado via `lib/audit.ts` (`createAuditLog()`):
+
+- **Cobertura:** todas as acoes (organizations, integrations, tenants, users, invitations, billing, admin, auth)
+- **Campos:** `action`, `module`, `actor` (userId), `actorEmail`, `actorType`, `summary`, `beforeJson`, `afterJson`, `metadataJson`, `timestamp`, `tenantId`
+- **Indexes:** `tenantId+timestamp`, `actor+timestamp`, `module+timestamp`
+- **Eventos de autenticacao:** instrumentados via `events.signIn` / `events.signOut` do Auth.js + wrapper no server action
+  - `login_success` — usuario autenticado com sucesso (metadata: `method: google_oauth`, `name`, `isNewUser`)
+  - `login_failure` — falha no fluxo OAuth (metadata: `reason`)
+  - `logout` — encerramento de sessao controlado pela aplicacao
+- **Visibilidade:**
+  - Admin (`/admin/audit`) ve todos os eventos da plataforma
+  - Tenant (`/app/audit`) ve eventos proprios + eventos de auth dos usuarios membros (isolamento multi-tenant preservado via `memberIds` lookup)
+
 ## Dev
 
 ```bash
-npm run dev          # Next.js em :3000
+npm run dev          # Next.js em :3000 (ou PORT=3100 npm run dev)
 npm run storybook    # Storybook em :6006
 npm run db:push      # sync Prisma schema com Neon
 npm run db:studio    # Prisma Studio (visual DB browser)
@@ -226,8 +246,9 @@ nimbus-frugal/
 │   ├── tenant.ts            # requireUser, requireTenant, requireAdmin
 │   ├── subscription.ts      # Trial/access helpers
 │   ├── billing-actions.ts   # Server actions: upgradeToPro, createAdditionalTenant, deleteTenant
-│   ├── auth-actions.ts      # Server actions: loginWithGoogle
+│   ├── auth-actions.ts      # Server actions: loginWithGoogle (com captura de login_failure)
 │   ├── actions.ts           # Server actions: logout
+│   ├── audit.ts             # createAuditLog() centralizado
 │   ├── validations.ts       # Zod schemas
 │   ├── locale-actions.ts    # Server action: setLocale (cookie NEXT_LOCALE)
 │   └── aws-cloudformation.ts # CloudFormation template generator
@@ -259,7 +280,7 @@ nimbus-frugal/
 ├── .env.example
 ├── CLAUDE.md                # Convencoes do projeto para AI
 ├── middleware.ts             # Protecao de rotas (cookie-based, Edge < 1MB)
-└── auth.ts                  # Auth.js v5 config (Google + Resend)
+└── auth.ts                  # Auth.js v5 config (Google OAuth only, events.signIn/signOut para audit)
 ```
 
 ## Time

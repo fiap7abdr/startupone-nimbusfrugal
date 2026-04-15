@@ -2,7 +2,7 @@ import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { signIn } from "@/auth";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/ui/submit-button";
 import {
   Card,
   CardContent,
@@ -45,7 +45,7 @@ export default async function NimbusSetupPage() {
         </CardHeader>
         <CardContent>
           <form action={setupWithGoogle} className="space-y-4">
-            <Button type="submit" variant="outline" className="w-full" size="lg">
+            <SubmitButton variant="outline" className="w-full" size="lg" pendingText={t("setup_google")}>
               <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
@@ -65,7 +65,7 @@ export default async function NimbusSetupPage() {
                 />
               </svg>
               {t("setup_google")}
-            </Button>
+            </SubmitButton>
             <p className="text-center text-xs text-muted-foreground">
               {t("setup_warning")}
             </p>

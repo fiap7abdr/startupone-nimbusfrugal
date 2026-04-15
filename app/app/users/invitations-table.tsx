@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
@@ -43,6 +43,7 @@ export function InvitationsTable({
   const router = useRouter();
   const [resendingId, setResendingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deletePending, startDeleteTransition] = useTransition();
   const [, setTick] = useState(0);
 
   // Re-render every 30s to update cooldown state
@@ -63,10 +64,12 @@ export function InvitationsTable({
     }
   }
 
-  async function handleDelete(invitationId: string) {
-    await deleteInvite(invitationId);
-    setDeletingId(null);
-    router.refresh();
+  function handleDelete(invitationId: string) {
+    startDeleteTransition(async () => {
+      await deleteInvite(invitationId);
+      setDeletingId(null);
+      router.refresh();
+    });
   }
 
   function formatDate(dateStr: string) {
@@ -202,9 +205,10 @@ export function InvitationsTable({
             </DialogClose>
             <Button
               variant="destructive"
+              disabled={deletePending}
               onClick={() => deletingId && handleDelete(deletingId)}
             >
-              {t("delete_invite")}
+              {deletePending ? tc("loading") : t("delete_invite")}
             </Button>
           </div>
         </DialogContent>

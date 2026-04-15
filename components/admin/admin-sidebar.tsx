@@ -16,7 +16,13 @@ import {
   ScrollText,
 } from "lucide-react";
 
-export function AdminSidebar({ adminEmail }: { adminEmail: string }) {
+export function AdminSidebar({
+  adminEmail,
+  adminName,
+}: {
+  adminEmail: string;
+  adminName?: string | null;
+}) {
   const pathname = usePathname();
   const t = useTranslations("admin");
 
@@ -36,9 +42,11 @@ export function AdminSidebar({ adminEmail }: { adminEmail: string }) {
         <div className="flex h-8 w-8 items-center justify-center rounded-md bg-negative">
           <ShieldCheck className="h-4 w-4" />
         </div>
-        <div>
-          <p className="text-sm font-semibold">Nimbus · Admin</p>
-          <p className="text-[11px] text-white/60">{adminEmail}</p>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold" title={adminEmail}>
+            {adminName ?? adminEmail}
+          </p>
+          <p className="text-[11px] text-white/60">Nimbus · Admin</p>
         </div>
       </div>
       <nav className="flex-1 space-y-1 px-3 py-4">

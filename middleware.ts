@@ -2,9 +2,8 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 const PROTECTED_APP = /^\/app(\/|$)/;
-const PROTECTED_ADMIN = /^\/admin(?!\/login)(\/|$)/;
+const PROTECTED_ADMIN = /^\/admin(?!\/login|\/forbidden)(\/|$)/;
 const PROTECTED_NEW_TENANT = /^\/new-tenant(\/|$)/;
-const PROTECTED_INVITATIONS = /^\/invitations(\/|$)/;
 
 const LOCALES = ["pt-BR", "en"];
 const DEFAULT_LOCALE = "pt-BR";
@@ -29,9 +28,7 @@ export function middleware(req: NextRequest) {
     req.cookies.get("__Secure-authjs.session-token")?.value;
 
   if (
-    (PROTECTED_APP.test(pathname) ||
-      PROTECTED_NEW_TENANT.test(pathname) ||
-      PROTECTED_INVITATIONS.test(pathname)) &&
+    (PROTECTED_APP.test(pathname) || PROTECTED_NEW_TENANT.test(pathname)) &&
     !sessionCookie
   ) {
     const url = req.nextUrl.clone();

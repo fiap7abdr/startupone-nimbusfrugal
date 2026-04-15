@@ -11,9 +11,17 @@ import { prisma } from "@/lib/prisma";
 import { requireTenant } from "@/lib/tenant";
 import { formatDate } from "@/lib/utils";
 import { getTranslations } from "next-intl/server";
+import { DemoToggle } from "./demo-toggle";
+import { WelcomeDialog } from "./welcome-dialog";
 
-export default async function SettingsPage() {
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ welcome?: string }>;
+}) {
   const { tenant } = await requireTenant();
+  const sp = await searchParams;
+  const showWelcome = sp.welcome === "1" && !tenant.demoMode;
   const [t, tc] = await Promise.all([
     getTranslations("settings"),
     getTranslations("common"),
@@ -24,6 +32,16 @@ export default async function SettingsPage() {
 
   return (
     <div>
+      <WelcomeDialog
+        initialOpen={showWelcome}
+        labels={{
+          title: t("welcome_title"),
+          description: t("welcome_desc"),
+          enable: t("welcome_enable"),
+          skip: t("welcome_skip"),
+          enabling: t("demo_updating"),
+        }}
+      />
       <PageHeader
         title={t("title")}
         description={t("description")}
@@ -62,6 +80,25 @@ export default async function SettingsPage() {
             />
             <Row label={tc("status")} value={billing?.billingStatus ?? "—"} />
             <Row label={t("trial_expires")} value={formatDate(billing?.trialEndsAt)} />
+          </CardContent>
+        </Card>
+
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle>{t("demo_title")}</CardTitle>
+            <CardDescription>{t("demo_desc")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DemoToggle
+              enabled={tenant.demoMode}
+              labels={{
+                on: t("demo_on"),
+                off: t("demo_off"),
+                enable: t("demo_enable"),
+                disable: t("demo_disable"),
+                updating: t("demo_updating"),
+              }}
+            />
           </CardContent>
         </Card>
       </div>
