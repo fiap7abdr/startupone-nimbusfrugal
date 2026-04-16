@@ -13,13 +13,15 @@ import { formatDate } from "@/lib/utils";
 import { getTranslations } from "next-intl/server";
 import { DemoToggle } from "./demo-toggle";
 import { WelcomeDialog } from "./welcome-dialog";
+import { TenantNameEdit } from "./tenant-name-edit";
 
 export default async function SettingsPage({
   searchParams,
 }: {
   searchParams: Promise<{ welcome?: string }>;
 }) {
-  const { tenant } = await requireTenant();
+  const { tenant, user } = await requireTenant();
+  const isOwner = tenant.ownerUserId === user.id;
   const sp = await searchParams;
   const showWelcome = sp.welcome === "1" && !tenant.demoMode;
   const [t, tc] = await Promise.all([
@@ -53,7 +55,21 @@ export default async function SettingsPage({
             <CardDescription>{t("tenant_desc")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
-            <Row label={tc("name")} value={tenant.name} />
+            <Row
+              label={tc("name")}
+              value={
+                <TenantNameEdit
+                  initialName={tenant.name}
+                  canEdit={isOwner}
+                  labels={{
+                    edit: t("name_edit"),
+                    save: t("name_save"),
+                    cancel: t("name_cancel"),
+                    saving: t("name_saving"),
+                  }}
+                />
+              }
+            />
             <Row label={t("slug")} value={<span className="font-mono">{tenant.slug}</span>} />
             <Row label={tc("status")} value={tenant.status} />
             <Row label={t("created_at")} value={formatDate(tenant.createdAt)} />
